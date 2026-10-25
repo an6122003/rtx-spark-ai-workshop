@@ -27,6 +27,18 @@ by **[An À Ha](https://annguyen.work)** · Engineer & AI Product Builder · Tec
 - **Enterprise batch AI, measured rather than claimed.** 2,400 customer messages, 1,000 scanned invoices and 300 recorded calls run as real background jobs. Every item has an answer key, so the page shows live accuracy, throughput, GPU energy and the cost compared with cloud APIs.
 - **A page made for the machine.** The studio page shows the RTX Spark itself. NVIDIA's specifications sit next to a drawing of the chip that lights up with the GPU's real work, and next to what the laptop is doing right now. Vietnamese and English, no event branding, and no internet needed after setup.
 
+## Demo videos
+
+<table>
+<tr>
+<td width="60%" valign="top"><a href="docs/video/rtx-spark-film-16x9.mp4"><img src="docs/images/rtx/film-16x9.jpg" alt="The film's title: “Everything runs here.” next to the RTX Spark chip"></a><br><sub><b>▶ The film, 72 s (16:9).</b> The machine, setup, the four labs, the GPU through a 16-minute run, and the numbers.</sub></td>
+<td width="20%" valign="top"><a href="docs/video/rtx-spark-film-9x16.mp4"><img src="docs/images/rtx/film-9x16.jpg" alt="The vertical film's benchmark page: Nemotron 3.5 Lightning 30B writes 83.5 tokens a second, with seven more measured numbers"></a><br><sub><b>▶ The film, vertical (9:16).</b></sub></td>
+<td width="20%" valign="top"><a href="docs/video/rtx-spark-quicktest-9x16.mp4"><img src="docs/images/rtx/quicktest-9x16.jpg" alt="The quick test's first frame: “Can a laptop run a 30B AI model offline?”"></a><br><sub><b>▶ Quick test, 38 s (9:16).</b> For TikTok and Reels.</sub></td>
+</tr>
+</table>
+
+Every number in them was measured on this laptop (ASUS ProArt P16) while the workshop ran its labs and batch jobs, so a few differ a little from the session timings below. The videos live in `docs/video` and are left out of the installer's download.
+
 ## Quick start
 
 On the RTX Spark, open **PowerShell** (no administrator rights needed) and paste:
@@ -145,12 +157,13 @@ hands-on-2-rag\                  corpus\ (28 manuals) · index\ · ingestion\ ·
 hands-on-3-agent\                tools\ · data\ (the sales workbook)
 enterprise\generate\             seeded generators: inbox.py · invoices.py · calls.py
 workshop.env                     settings: models, ports, the pinned Windows versions
+docs\video\                      the demo videos (left out of the installer's download)
 install.sh · setup.sh · scripts\ the DGX Spark edition's files, kept in step with it
 ```
 
 ## Credits and licences
 
-The workshop code is Apache-2.0 ([LICENSE](LICENSE)). It downloads, and does not include, third-party software and models, each under its own licence: Ollama, uv, Python, PyTorch, llama.cpp, NVIDIA Nemotron and Qwen models, VinAI's PhoWhisper (BSD-3-Clause), and Piper TTS (GPL-3.0, installed in its own environment) with the `vi_VN-vais1000` voice (trained on the VAIS-1000 corpus, CC BY 4.0). Bundled: Plus Jakarta Sans and JetBrains Mono (the studio page) and Be Vietnam Pro and Saira (the classic page), all under the SIL Open Font License, and GSAP (GreenSock's standard no-charge licence). All companies, people and data in the labs and demos are invented.
+The workshop code is Apache-2.0 ([LICENSE](LICENSE)). It downloads, and does not include, third-party software and models, each under its own licence: Ollama, uv, Python, PyTorch, llama.cpp, NVIDIA Nemotron and Qwen models, VinAI's PhoWhisper (BSD-3-Clause), and Piper TTS (GPL-3.0, installed in its own environment) with the `vi_VN-vais1000` voice (trained on the VAIS-1000 corpus, CC BY 4.0). Bundled: Plus Jakarta Sans and JetBrains Mono (the studio page) and Be Vietnam Pro and Saira (the classic page), all under the SIL Open Font License, and GSAP (GreenSock's standard no-charge licence). The demo videos' music and sound effects were made with ElevenLabs. All companies, people and data in the labs and demos are invented.
 
 NVIDIA, the NVIDIA logo, RTX, Grace, Blackwell and Nemotron are trademarks and/or registered trademarks of NVIDIA Corporation in the U.S. and other countries. Windows is a trademark of the Microsoft group of companies. ASUS and ProArt are trademarks of ASUSTeK Computer Inc. Other names may be trademarks of their respective owners.
 
