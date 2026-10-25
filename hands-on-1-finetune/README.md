@@ -8,7 +8,7 @@
 
 Lấy một mô hình mở nhỏ (**Qwen2.5-1.5B-Instruct**) và dạy nó trở thành
 **Aurora** — trợ lý kỹ thuật của công ty (hư cấu) Aurora Grid Systems — chỉ trong
-vài phút trên GPU của DGX Spark. Sau đó đặt câu hỏi cho cả mô hình gốc và mô hình
+vài phút trên GPU của RTX Spark. Sau đó đặt câu hỏi cho cả mô hình gốc và mô hình
 đã tinh chỉnh, và so sánh song song.
 
 ```
@@ -63,7 +63,7 @@ dữ liệu (86 ví dụ) ──▶ LoRA trên GPU ──▶ gộp + GGUF ──
 
 Take a small open model (**Qwen2.5-1.5B-Instruct**) and teach it to become
 **Aurora**, the technical assistant of the fictional company Aurora Grid Systems,
-in a few minutes on the DGX Spark's GPU. Then ask the original and the
+in a few minutes on the RTX Spark's GPU. Then ask the original and the
 fine-tuned model the same questions, side by side.
 
 ### Key ideas

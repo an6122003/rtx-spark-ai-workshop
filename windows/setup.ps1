@@ -402,8 +402,12 @@ if ($TrainOk) {
 }
 
 # Train the example once, as on the Spark: it proves the GPU path and gives the comparison its model.
+# Again when an update brings different training examples, so every machine's Aurora says the same.
 $TrainerFile = Join-Path $Run 'lab1-trainer.json'
-if ($TrainOk -and (Test-Path -LiteralPath $TrainerFile) -and (Test-OllamaHas $Lab1Tuned)) {
+$TrainData = try { (Get-FileHash -LiteralPath (Join-Path $Root 'hands-on-1-finetune\data\train.jsonl') -Algorithm SHA256).Hash } catch { '' }
+$Trained = $null
+if (Test-Path -LiteralPath $TrainerFile) { try { $Trained = Get-Content -LiteralPath $TrainerFile -Raw | ConvertFrom-Json } catch {} }
+if ($TrainOk -and $Trained -and $Trained.data -eq $TrainData -and (Test-OllamaHas $Lab1Tuned)) {
     Show-Ok "Fine-tuned model '$Lab1Tuned' already in Ollama" "Mô hình '$Lab1Tuned' đã có trong Ollama"
     $Lab1 = 'ready'
 } elseif ($TrainOk) {
@@ -413,7 +417,7 @@ if ($TrainOk -and (Test-Path -LiteralPath $TrainerFile) -and (Test-OllamaHas $La
     if ($smokeSteps) { $trainArgs += @('--max-steps', $smokeSteps) }
     $code = Invoke-Logged 'Training the example model (about a minute on the GPU)' $TorchPy $trainArgs
     if ($code -eq 0 -and (Test-OllamaHas $Lab1Tuned)) {
-        $info = @{ ready = $true; device = $TorchDevice; torch = $TorchSpec; trained = (Get-Date -Format 's') } | ConvertTo-Json -Compress
+        $info = @{ ready = $true; device = $TorchDevice; torch = $TorchSpec; trained = (Get-Date -Format 's'); data = $TrainData } | ConvertTo-Json -Compress
         [IO.File]::WriteAllText($TrainerFile, $info)
         Show-Ok "Example model '$Lab1Tuned' trained and added to Ollama" "Đã huấn luyện mô hình mẫu '$Lab1Tuned'"
         $Lab1 = 'ready'
