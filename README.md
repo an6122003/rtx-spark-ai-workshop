@@ -66,7 +66,7 @@ The home page has a section on the laptop itself. It lists NVIDIA's specificatio
 
 <table>
 <tr>
-<td width="50%"><img src="docs/images/rtx/lab1.jpg" alt="Lab 1: the base model guesses a torque; the fine-tuned model answers 25 Nm and names its source document"><br><sub><b>01 Fine-tuning.</b> Same question, before and after a 40-second LoRA run.</sub></td>
+<td width="50%"><img src="docs/images/rtx/lab1.jpg" alt="Lab 1: the base model says it is Qwen from Alibaba Cloud; the fine-tuned model answers as Aurora, running on this NVIDIA RTX Spark"><br><sub><b>01 Fine-tuning.</b> Same question, before and after a 40-second LoRA run.</sub></td>
 <td width="50%"><img src="docs/images/rtx/lab2.jpg" alt="Lab 2: without RAG the model gives the withdrawn 5-minute rule; with RAG it gives the current 12-minute rule and its source"><br><sub><b>02 RAG.</b> Without documents the model repeats a withdrawn rule. With RAG it cites the current one.</sub></td>
 </tr>
 <tr>
