@@ -31,9 +31,9 @@ by **[An À Ha](https://annguyen.work)** · Engineer & AI Product Builder · Tec
 
 <table>
 <tr>
-<td width="60%" valign="top"><a href="docs/video/rtx-spark-film-16x9.mp4"><img src="docs/images/rtx/film-16x9.jpg" alt="The film's title: “Everything runs here.” next to the RTX Spark chip"></a><br><sub><b>▶ The film, 72 s (16:9).</b> The machine, setup, the four labs, the GPU through a 16-minute run, and the numbers.</sub></td>
-<td width="20%" valign="top"><a href="docs/video/rtx-spark-film-9x16.mp4"><img src="docs/images/rtx/film-9x16.jpg" alt="The vertical film's benchmark page: Nemotron 3.5 Lightning 30B writes 83.5 tokens a second, with seven more measured numbers"></a><br><sub><b>▶ The film, vertical (9:16).</b></sub></td>
-<td width="20%" valign="top"><a href="docs/video/rtx-spark-quicktest-9x16.mp4"><img src="docs/images/rtx/quicktest-9x16.jpg" alt="The quick test's first frame: “Can a laptop run a 30B AI model offline?”"></a><br><sub><b>▶ Quick test, 38 s (9:16).</b> For TikTok and Reels.</sub></td>
+<td width="60%" valign="top"><a href="docs/video/rtx-spark-film-16x9.mp4?raw=true"><img src="docs/images/rtx/film-16x9.jpg" alt="The film's title: “Everything runs here.” next to the RTX Spark chip"></a><br><sub><b>▶ The film, 72 s (16:9).</b> The machine, setup, the four labs, the GPU through a 16-minute run, and the numbers.</sub></td>
+<td width="20%" valign="top"><a href="docs/video/rtx-spark-film-9x16.mp4?raw=true"><img src="docs/images/rtx/film-9x16.jpg" alt="The vertical film's benchmark page: Nemotron 3.5 Lightning 30B writes 83.5 tokens a second, with seven more measured numbers"></a><br><sub><b>▶ The film, vertical (9:16).</b></sub></td>
+<td width="20%" valign="top"><a href="docs/video/rtx-spark-quicktest-9x16.mp4?raw=true"><img src="docs/images/rtx/quicktest-9x16.jpg" alt="The quick test's first frame: “Can a laptop run a 30B AI model offline?”"></a><br><sub><b>▶ Quick test, 38 s (9:16).</b> For TikTok and Reels.</sub></td>
 </tr>
 </table>
 
