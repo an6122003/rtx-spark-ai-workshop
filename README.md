@@ -1,21 +1,20 @@
 <div align="center">
 
-<img src="docs/images/home.jpg" alt="The workshop app on a DGX Spark: ACE 2026 Vietnam, Agentic Computing at the Edge" width="100%">
+<img src="docs/images/rtx/home.jpg" alt="The studio page on an RTX Spark laptop: “Everything runs here.” next to a live drawing of the chip" width="100%">
 
-# Agentic AI at the Edge — a DGX Spark workshop
+# RTX Spark AI Workshop
 
-**Fine-tuning, RAG, AI agents and enterprise batch jobs, running entirely on one NVIDIA DGX Spark.**<br>
-One command installs and verifies everything. One bilingual web app runs the whole day, with no cloud calls.
+**Fine-tuning, RAG, an AI agent and enterprise batch jobs, running entirely on one NVIDIA RTX Spark laptop.**<br>
+One PowerShell command installs and checks everything. One bilingual web app runs the whole session, with no cloud calls.
 
-![NVIDIA DGX Spark](https://img.shields.io/badge/NVIDIA-DGX%20Spark%20·%20GB10-76B900?logo=nvidia&logoColor=white)
-![NemoClaw](https://img.shields.io/badge/NVIDIA-NemoClaw%20+%20OpenClaw-76B900?logo=nvidia&logoColor=white)
-![vLLM](https://img.shields.io/badge/vLLM-NVFP4%20batch%20engine-1f6feb)
+![NVIDIA RTX Spark](https://img.shields.io/badge/NVIDIA-RTX%20Spark%20·%20N1X-76B900?logo=nvidia&logoColor=white)
+![Windows 11 on Arm](https://img.shields.io/badge/Windows%2011-on%20Arm-0078D4)
 ![Ollama](https://img.shields.io/badge/Ollama-Nemotron%20·%20Qwen-111111)
+![llama.cpp](https://img.shields.io/badge/llama.cpp-batch%20engine-1f6feb)
 ![Offline](https://img.shields.io/badge/works-offline%20after%20setup-2ea44f)
 ![License](https://img.shields.io/badge/license-Apache--2.0-blue)
 
-Built for **ACE 2026 Vietnam · Agentic Computing at the Edge** (GIGABYTE × NVIDIA, Ho Chi Minh City, 8 October 2026)<br>
-by **[An À Ha](https://annguyen.work)** · Engineer & AI Product Builder
+by **[An À Ha](https://annguyen.work)** · Engineer & AI Product Builder · Tech & AI Creator
 
 </div>
 
@@ -23,208 +22,140 @@ by **[An À Ha](https://annguyen.work)** · Engineer & AI Product Builder
 
 ## Highlights
 
-- **From a fresh machine to a verified demo with one command.** The installer sets up Docker, the NVIDIA Container Toolkit, Ollama, NVIDIA NemoClaw, a vLLM batch engine and about 120 GB of models. Then it runs every lab end to end and opens the app. Running it again updates the files and skips finished steps.
-- **Three hands-on labs and a build challenge**, each with a live before/after comparison: a LoRA fine-tune that finishes in about 40 seconds, RAG over 28 manuals inside a NemoClaw sandbox, and an agent that turns a spreadsheet into a chart and an Excel report. Teams then build their own agents in OpenClaw.
+- **From a new laptop to a checked demo with one command.** No administrator rights, Developer Mode or WSL. The installer sets up Ollama, Python, NVIDIA's CUDA build of PyTorch for Windows on Arm, llama.cpp and about 58 GB of models. It trains the example model once, runs every lab end to end and adds a desktop shortcut. Running it again updates the files and skips finished steps, so an update takes under a minute.
+- **Three hands-on labs**, each with a live before-and-after comparison: a LoRA fine-tune on the laptop's GPU in about 40 seconds, RAG over 28 technical manuals, and an agent that turns a spreadsheet into a chart and an Excel report.
 - **Enterprise batch AI, measured rather than claimed.** 2,400 customer messages, 1,000 scanned invoices and 300 recorded calls run as real background jobs. Every item has an answer key, so the page shows live accuracy, throughput, GPU energy and the cost compared with cloud APIs.
-- **Built for a live room.** Vietnamese and English, works without internet after setup, survives reboots (it relaunches NemoClaw's gateway itself), and degrades gracefully so a broken sandbox never stops a demo.
+- **A page made for the machine.** The studio page shows the RTX Spark itself. NVIDIA's specifications sit next to a drawing of the chip that lights up with the GPU's real work, and next to what the laptop is doing right now. Vietnamese and English, no event branding, and no internet needed after setup.
 
 ## Quick start
 
-On the DGX Spark, in a terminal (no `sudo`; it asks for the password once):
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/an6122003/nemoclaw-rag-demo/main/install.sh | bash
-```
-
-It downloads the workshop into `~/dgx-workshop`, runs `setup.sh` (install, download, check every lab) and opens the app at `http://127.0.0.1:8090`. After that:
-
-```bash
-bash ~/dgx-workshop/start.sh   # or double-click "DGX Spark Workshop" on the desktop
-bash ~/dgx-workshop/stop.sh
-```
-
-Machines that only run the morning labs can skip the batch demos (about 38 GB):
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/an6122003/nemoclaw-rag-demo/main/install.sh | bash -s -- --skip-enterprise
-```
-
-A non-technical operator should start with [START-HERE.md](START-HERE.md) (Vietnamese and English).
-
-### Windows: the NVIDIA RTX Spark
-
-The RTX Spark runs Windows 11 on Arm. Its edition runs everything directly on the PC, with no
-NemoClaw sandbox (NemoClaw only runs on Windows through WSL 2) and no OpenClaw challenge tab;
-the Enterprise batch engine is llama.cpp's `llama-server` instead of vLLM. In PowerShell, no
-administrator rights needed:
+On the RTX Spark, open **PowerShell** (no administrator rights needed) and paste:
 
 ```powershell
-irm https://raw.githubusercontent.com/an6122003/nemoclaw-rag-demo/windows/install.ps1 | iex
+irm https://raw.githubusercontent.com/an6122003/rtx-spark-ai-workshop/main/install.ps1 | iex
 ```
 
-It installs into `~\ai-workshop` (Ollama, Python, NVIDIA's CUDA PyTorch for Windows on Arm,
-llama.cpp, the models), trains the example model once, checks every lab and adds a desktop
-shortcut. The app opens on the studio page ([app/studio.html](app/studio.html)): a light
-interface made for RTX Spark laptops, with no event branding, whose chip visual follows the
-GPU's real work; the event page stays at `/classic`. Operators: [START-HERE-WINDOWS.md](START-HERE-WINDOWS.md). Verified end to end on a
-real RTX Spark (ASUS ProArt P16, RTX Spark N1X, 128 GB): 38 minutes from a fresh machine, with
-every lab and batch demo on the GPU. Every change is also tested on GitHub's Windows-on-Arm
-machines (CPU only, small models) by [.github/workflows/windows.yml](.github/workflows/windows.yml).
+It downloads the workshop into `~\ai-workshop`, runs `windows\setup.ps1` (install, download, train, check every lab) and opens the app at `http://127.0.0.1:8090`. Plug in the charger and keep the lid open while it installs; it keeps the laptop awake by itself. After that:
+
+- **Start:** double-click **RTX Spark Workshop** on the desktop (or in the Start menu).
+- **Update:** run the same command again. The downloaded models are kept.
+- **Stop everything:** `powershell -ExecutionPolicy Bypass -File "$HOME\ai-workshop\windows\stop.ps1"`
+
+Laptops that only run the hands-on labs can skip the batch demos (about 25 GB):
+
+```powershell
+$env:WORKSHOP_SKIP_ENTERPRISE = 1; irm https://raw.githubusercontent.com/an6122003/rtx-spark-ai-workshop/main/install.ps1 | iex
+```
+
+A non-technical operator should start with [START-HERE-WINDOWS.md](START-HERE-WINDOWS.md) (Vietnamese and English).
+
+## The machine, up close
+
+<img src="docs/images/rtx/machine.jpg" alt="The home page's RTX Spark section: the specifications on the left; on the right the chip zoomed onto its memory, above a live map of the models in memory" width="100%">
+
+The home page has a section on the laptop itself. It lists NVIDIA's specifications for the RTX Spark: 6,144 CUDA cores, a 20-core Grace CPU, 128 GB of unified LPDDR5X, 1 petaflop of AI, the NPU and 45–80 W. Each one is tied to a block of the chip drawn behind the page. Pick one and the chip flies onto that block, next to what this machine reports right now: GPU load, temperature and clock, the computer's maker and model, the driver and CUDA version, power draw, and a map of memory with one square per GB showing which models are loaded. Left alone, the section tours the chip by itself. The original event page is still there at `/classic`.
 
 ## The hands-on labs
 
 | | Lab | What the audience sees |
 |---|---|---|
-| 01 | **Fine-tuning local LLMs** · [hands-on-1-finetune](hands-on-1-finetune/) | LoRA on Qwen2.5-1.5B inside NVIDIA's PyTorch container, a live loss curve, export to GGUF, `ollama create`, then the same question to the model before and after |
-| 02 | **RAG with NemoClaw** · [hands-on-2-rag](hands-on-2-rag/) | 28 technical manuals of a fictional energy company, retrieved by OpenClaw's memory search inside the NemoClaw sandbox; answers cite their passages, with traps for look-alike products and withdrawn safety rules |
-| 03 | **An agentic workflow** · [hands-on-3-agent](hands-on-3-agent/) | "Analyse sales by region…" → the NemoClaw agent reads the Excel file and calls Python tools (pandas, matplotlib, openpyxl) → chart, insight and an Excel report, every step traced live |
-| 04 | **Challenge: build your own agent** | teams open OpenClaw's own UI on the Spark (signed in through `/openclaw`) with shell, Python, files, memory search over the manuals and a sales skill; a second model is one click away |
+| 01 | **Fine-tuning local LLMs** · [hands-on-1-finetune](hands-on-1-finetune/) | LoRA on Qwen2.5-1.5B with PyTorch on the laptop's GPU (55 steps in about 40 s), a live loss curve, export to GGUF, `ollama create`, then the same question to the model before and after |
+| 02 | **RAG on the laptop** · [hands-on-2-rag](hands-on-2-rag/) | 28 technical manuals of a fictional energy company, searched through a local `qwen3-embedding` index; answers cite their passages, with traps for look-alike products and withdrawn safety rules |
+| 03 | **An agentic workflow** · [hands-on-3-agent](hands-on-3-agent/) | "Analyse sales by region…" → the agent (NVIDIA Nemotron 3.5 Lightning on Ollama) reads the Excel file and calls Python tools (pandas, matplotlib, openpyxl) → a chart, the insight and an Excel report in 10–15 s, every step traced live |
+| 04 | **Enterprise: AI on the night shift** | three batch jobs that companies pay people or cloud APIs to do every day, [below](#enterprise-ai-on-the-night-shift) |
 
 <table>
 <tr>
-<td width="50%"><img src="docs/images/lab1-compare.jpg" alt="Lab 1: the base model says it is Qwen; after fine-tuning it answers as Aurora, the company's assistant"><br><sub><b>01 Fine-tuning.</b> Same question, before and after a 40-second LoRA run.</sub></td>
-<td width="50%"><img src="docs/images/lab2-answer.jpg" alt="Lab 2: without RAG the model gives an outdated 5-minute rule; with RAG it cites the 12-minute rule from the current safety bulletin"><br><sub><b>02 RAG.</b> Without documents the model repeats a withdrawn rule. With RAG it cites the current bulletin.</sub></td>
+<td width="50%"><img src="docs/images/rtx/lab1.jpg" alt="Lab 1: the base model guesses a torque; the fine-tuned model answers 25 Nm and names its source document"><br><sub><b>01 Fine-tuning.</b> Same question, before and after a 40-second LoRA run.</sub></td>
+<td width="50%"><img src="docs/images/rtx/lab2.jpg" alt="Lab 2: without RAG the model gives the withdrawn 5-minute rule; with RAG it gives the current 12-minute rule and its source"><br><sub><b>02 RAG.</b> Without documents the model repeats a withdrawn rule. With RAG it cites the current one.</sub></td>
 </tr>
 <tr>
-<td width="50%"><img src="docs/images/lab3-answer.jpg" alt="Lab 3: the agent's findings, a revenue-by-region chart and an Excel report download"><br><sub><b>03 Agent.</b> Four tool calls through NemoClaw: findings, a chart and an Excel report.</sub></td>
-<td width="50%"><img src="docs/images/openclaw.jpg" alt="The OpenClaw challenge tab: open OpenClaw, starter ideas and model choice"><br><sub><b>04 Challenge.</b> One click into OpenClaw, with starter ideas and a model switch.</sub></td>
+<td width="50%"><img src="docs/images/rtx/lab3.jpg" alt="Lab 3: the model alone asks for data; the agent with tools names the fastest-growing region, with a chart and an Excel report"><br><sub><b>03 Agent.</b> Four tool calls on the laptop: findings, a chart and an Excel report.</sub></td>
+<td width="50%"><img src="docs/images/rtx/ent.jpg" alt="The Enterprise chapter: AI on the night shift, with the batch engine and the GPU's live state"><br><sub><b>04 Enterprise.</b> Batch AI over thousands of items, with live accuracy and cost.</sub></td>
 </tr>
 </table>
 
 ## Enterprise: AI on the night shift
 
-For the afternoon business session: three jobs that companies pay people or cloud APIs to do every day, run as real batches over realistic volumes of invented data for the fictional retailer **Aurora Mart**. The point is the economics. The data never leaves the company, there is no per-item fee, and one desk-side box gets through months of work in hours.
+For the business session: three jobs run as real batches over invented data for the fictional retailer **Aurora Mart**. The point is the economics. The data never leaves the company, there is no per-item fee, and one laptop gets through hours of work while the room watches.
 
-<img src="docs/images/ent-overview.jpg" alt="The Enterprise tab: the batch engine status, GPU power, and the three jobs with their progress" width="100%">
-
-| Job | Input | What the AI does | Measured on one DGX Spark |
+| Job | Input | What the AI does | On an RTX Spark |
 |---|---|---|---|
-| **Inbox triage** | 2,400 messages (email, Zalo, Messenger), with typos, no diacritics and chat shorthand | topic, urgency under the company's own policy, sentiment, red flags, order number; a draft reply for critical ones; phones and e-mails masked | **~180 messages/min** · topic 98.5 % · urgency 89.8 % · sentiment 96.8 % · order number 100 % · **47 of 47 critical messages caught** |
-| **Invoices → Excel** | 1,000 scanned VAT invoices from 24 suppliers (three templates, stamps, blur, tilt) | reads every field and line with a vision model, then checks the arithmetic and catches duplicates before they are paid twice | **~35 invoices/min** · 99–100 % per field · **23 of 24 planted errors caught, no false alarms** |
-| **Call quality** | 300 recorded calls (stereo, agent and customer on separate channels), about 4 hours of audio | Vietnamese speech-to-text on the GPU, then the QA checklist: greeting, recording notice, identity check, empathy, outcome, closing, violations | **~19 calls/min**, about 17× real time for transcription and scoring together · 97.6 % of checklist items match the answer key · pass/fail 98.3 % · **5 of 5 violations caught** · transcripts 87 % word-accurate |
+| **Inbox triage** | 2,400 messages (email, Zalo, Messenger), with typos, no diacritics and chat shorthand | topic, urgency under the company's own policy, sentiment, red flags, order number; a draft reply for critical ones; phones and e-mails masked | 300 messages in about 4 minutes (about 80 a minute) |
+| **Invoices → Excel** | 1,000 scanned VAT invoices from 24 suppliers (three templates, stamps, blur, tilt) | reads every field and line with a vision model, then checks the arithmetic and catches duplicates before they are paid twice | 100 invoices in about 10 minutes: start the batch before you talk about it |
+| **Call quality** | 300 recorded calls, agent and customer on separate channels, about 4 hours of audio | Vietnamese speech-to-text with VinAI's PhoWhisper on the GPU, then the QA checklist: greeting, recording notice, identity check, empathy, outcome, closing, violations | 30 calls in about 4 minutes |
 
-<table>
-<tr>
-<td width="50%"><img src="docs/images/ent-invoice-detail.jpg" alt="An invoice: the scanned image next to the fields the AI read, compared with the answer key"><br><sub><b>Invoices.</b> The scan, what the model read, and the answer key, field by field.</sub></td>
-<td width="50%"><img src="docs/images/ent-call-detail.jpg" alt="A call: audio player, the speech-to-text transcript and the AI scorecard next to the answer key"><br><sub><b>Calls.</b> The recording, its transcript and the AI scorecard next to the answer key.</sub></td>
-</tr>
-<tr>
-<td width="50%"><img src="docs/images/ent-inbox.jpg" alt="The inbox job: progress, throughput, accuracy against the answer key and the latest results"><br><sub><b>Inbox.</b> Live throughput, accuracy against the answer key, and the review queue.</sub></td>
-<td width="50%"><img src="docs/images/ent-cost.jpg" alt="Cost calculator: this machine against cloud API prices, per batch and per month"><br><sub><b>Cost.</b> Electricity and write-off against cloud prices, using the token counts measured here.</sub></td>
-</tr>
-</table>
+The batch engine is llama.cpp's `llama-server` with Qwen3.6-35B-A3B (a 4-bit GGUF that also reads images), working on 32 items at a time; Ollama answers one request at a time. The engine starts on demand, about 30 seconds the first time, and stops itself after 30 idle minutes to give its memory back to the labs. Any job can also run on Ollama, for a side-by-side comparison.
 
-**Why vLLM for the batches.** Ollama answers one request at a time, which suits interactive labs. For this model family it cannot run requests in parallel, so a batch of 1,000 invoices would take about 100 minutes. The batch engine is NVIDIA's vLLM container serving `nvidia/Qwen3.6-35B-A3B-NVFP4` (Blackwell's 4-bit format, reads images too), with 24–48 requests in flight. The same jobs run about 2.5–4× faster, and the tab can still run any job on Ollama for a side-by-side comparison. The engine starts on demand and gives its memory back to the labs after 30 idle minutes.
-
-## Architecture
-
-<img src="docs/images/architecture.svg" alt="Architecture: browser, workshop app, Ollama, NemoClaw sandbox, vLLM batch engine and NGC PyTorch container on one DGX Spark" width="100%">
-
-<details>
-<summary><b>Design notes: the problems worth solving</b></summary>
-
-- **Ollama for interactive work, vLLM for batches.** The chat and agent model is NVIDIA `nemotron-3.5-lightning:30b-a3b` (thinking off, about 99 tokens/s). Batches go to vLLM with NVFP4 weights. Batch memory is sized from what is free at start-up, keeping room for speech-to-text, and a lock makes sure several jobs asking at once start the engine only once.
-- **Client tools for Lab 3.** OpenClaw's gateway exposes an OpenAI-compatible `/v1/chat/completions` whose tool calls come back to the caller. The agent in the sandbox reasons and chooses; the app runs the Python and shows every step. A dedicated `analyst` agent with the `minimal` tool profile can only ask for the four tools the app offers.
-- **A narrow door for the sandbox.** NemoClaw keeps Ollama on loopback behind its token-gated proxy and rewrites every request to its one routed model. `scripts/embed-proxy.py` opens a door on the sandbox-facing address that forwards *only* embeddings (for memory search) and the one extra chat model OpenClaw's UI may switch to.
-- **256K context for OpenClaw's own agent.** It overflowed at 16K tokens. The chat models now carry `num_ctx 262144` as an Ollama model parameter (no sudo needed), measured at about 26 GB for Nemotron and 30 GB for Qwen.
-- **Offline restarts.** NemoClaw restarts a custom-port gateway only through `nemoclaw onboard`, whose DNS preflight fails offline. `scripts/nemoclaw-gateway.py` records the gateway's exact launch on every start and relaunches it after a reboot, in about 50 seconds.
-- **Answer keys everywhere.** Every generated message, invoice and call carries its truth, so accuracy is a live measurement. The prompts were tuned against it: urgency rose from 80 % to 90 % once the policy text matched how people actually write.
-- **Graceful degradation.** Lab 2 falls back to a bundled vector index, Lab 3 to the same agent loop on Ollama, batch jobs to Ollama, and the page always says which route answered.
-
-</details>
-
-<details>
-<summary><b>What <code>setup.sh</code> does, step by step</b></summary>
+## What setup does
 
 | # | Step | Notes |
 |---|---|---|
-| 1 | Check the computer | Linux/aarch64, GPU, memory, disk, internet; installs what is missing (curl, git, zstd, python3-venv, Docker + buildx, the NVIDIA Container Toolkit), starts Docker, adds the account to the docker group and continues inside it; asks for the sudo password, again if it was mistyped |
-| 2 | Ollama | installs or upgrades (≥ 0.32.9, NemoClaw's minimum; three attempts); systemd drop-in: loopback only, `OLLAMA_CONTEXT_LENGTH=32768`, keep-alive 30 min |
-| 3 | Models | `nemotron-3.5-lightning:30b-a3b` (~25 GB), `qwen3-embedding:4b` (2.5 GB), `qwen2.5:1.5b-instruct` (~1 GB), `qwen3.6:35b` (~22 GB, OpenClaw's second model); downloads reconnect when they crawl; chat models get a 262144-token context; checks the 2560-dim embedding |
-| 4 | Python env | `uv` + `.venv` with pinned pandas / matplotlib / openpyxl |
-| 5 | NemoClaw | official installer, then `nemoclaw onboard` (OpenClaw, Ollama provider, sandbox `dgx-workshop` on its own gateway, port 8990), with one `--resume` retry |
-| 6 | Lab 2 | starts the embedding door, uploads the corpus, configures memory search, builds the index |
-| 7 | Lab 3 + OpenClaw | creates the `analyst` agent, proves a tool call round-trips, installs the skill and keeps its Python wheels on the host; for OpenClaw's own chat: 256K context, 16K replies, Qwen as a second model, heartbeats off |
-| 8 | Lab 1 | pulls `nvcr.io/nvidia/pytorch:25.11-py3`, builds `workshop-finetune`, caches the base model, trains once |
-| 9 | Enterprise | generates 2,400 messages and 1,000 invoices; pulls `nvcr.io/nvidia/vllm:26.05.post1-py3`; downloads `nvidia/Qwen3.6-35B-A3B-NVFP4` and `vinai/PhoWhisper-medium` at pinned revisions; installs Piper in its own venv with the Vietnamese voice and records 300 calls; then starts the engine once and runs messages, invoices and calls through it |
-| 10 | Final check | `app/selftest.py` runs every lab end to end with the real models; summary; desktop shortcut |
+| 1 | Check the computer | Windows 11 on Arm, the NVIDIA GPU and its driver, memory, disk, internet; warns about Smart App Control and running on battery, and keeps the laptop awake until it finishes |
+| 2 | Python | `uv` with Python 3.13 for Arm64, in the workshop's own folder |
+| 3 | Ollama | a pinned release unpacked into the workshop folder, so it cannot update itself before an event |
+| 4 | Models | `nemotron-3.5-lightning:30b-a3b`, `qwen3-embedding:4b`, `qwen2.5:1.5b-instruct`; a 32,768-token context for the chat model |
+| 5 | Lab 1 | NVIDIA's CUDA build of PyTorch for Windows on Arm, llama.cpp's GGUF converter, the base model cached for offline training; trains `aurora-assistant` once |
+| 6 | Lab 2 | builds the document index (82 passages) with the embedding model |
+| 7 | Enterprise | about 25 GB: llama.cpp with CUDA, the Qwen3.6-35B-A3B GGUF and its vision projector, Piper with a Vietnamese voice, PhoWhisper; generates the messages, invoices and recorded calls, then checks the batch engine once |
+| 8 | Final check | runs every lab end to end with the real models, prints a summary and adds the desktop shortcut |
 
-Every step checks the real state first, so re-running is safe; everything is logged to `setup-log.txt`. Flags: `--check-only`, `--skip-finetune`, `--skip-sandbox`, `--skip-enterprise`, `--retrain`, `--no-start`, `--yes`. About 120 GB is downloaded; expect 1.5–2.5 hours on a good connection.
+Every step checks the real state first, so running it again is safe. Everything is logged to `setup-log.txt` in the workshop folder. Options, set before the command:
 
-</details>
+| | |
+|---|---|
+| `$env:WORKSHOP_DIR` | install folder (default `~\ai-workshop`) |
+| `$env:WORKSHOP_SKIP_ENTERPRISE = 1` | skip the batch demos |
+| `$env:WORKSHOP_CHECK_ONLY = 1` | inspect the laptop, change nothing |
+| `$env:WORKSHOP_YES = 1` · `$env:WORKSHOP_NO_START = 1` | no pause for the third-party software notice · do not open the app at the end |
+| `$env:WORKSHOP_BRANCH` | a branch or a full commit id to install instead of `main` |
 
-<details>
-<summary><b>Configuration</b></summary>
+Settings such as the models and ports live in [workshop.env](workshop.env); put your own values in `workshop.local.env` next to it.
 
-All settings live in [workshop.env](workshop.env) and can be overridden from the environment (`CHAT_MODEL=qwen3.5:9b bash setup.sh`).
+## Requirements and verified runs
 
-| Setting | Default | |
-|---|---|---|
-| `CHAT_MODEL` | `nemotron-3.5-lightning:30b-a3b` | chat + agent model, also the sandbox's inference model |
-| `EXTRA_CHAT_MODEL` | `qwen3.6:35b` | a second model for OpenClaw's own chat (`/model qwen`); empty to skip |
-| `CHAT_CONTEXT` / `CHAT_MAX_TOKENS` | `262144` / `16384` | context window of the chat models and OpenClaw's reply limit |
-| `EMBED_MODEL` | `qwen3-embedding:4b` | must match the pre-built index in `hands-on-2-rag/index/` |
-| `LAB1_BASE_HF` / `LAB1_BASE_OLLAMA` | `Qwen/Qwen2.5-1.5B-Instruct` / `qwen2.5:1.5b-instruct` | the model fine-tuned, and its library twin for "before" |
-| `BATCH_IMAGE` / `BATCH_MODEL` | `nvcr.io/nvidia/vllm:26.05.post1-py3` / `nvidia/Qwen3.6-35B-A3B-NVFP4` | the batch engine, pinned to the revision checked on a Spark |
-| `BATCH_GPU_MEMORY` / `BATCH_IDLE_MINUTES` | `0.30` / `30` | the engine's share of memory (less when memory is busy), and when it stops itself |
-| `ASR_MODEL` | `vinai/PhoWhisper-medium` | Vietnamese speech-to-text for the call demo |
-| `NEMOCLAW_GATEWAY_PORT` / `HUB_PORT` | `8990` / `8090` | the workshop's own OpenShell gateway, and the app (`start.sh --lan` serves other laptops) |
+- An **NVIDIA RTX Spark** PC with Windows 11 and a current NVIDIA driver; internet for setup only.
+- About **70 GB** free. About 58 GB is downloaded: 40 minutes on a fast connection, up to 2 hours on a slow one.
 
-</details>
+Verified on an ASUS ProArt P16 (NVIDIA RTX Spark N1X, 128 GB, Windows 11 build 28000, driver 617.69). The first install took 38 minutes on about 350 Mbit/s with all four parts ready, and an update takes about 40 seconds. Measured during a session:
 
-<details>
-<summary><b>Verified runs</b></summary>
+| | |
+|---|---|
+| Lab 1 | 55 training steps in about 40 s; the whole run, with the GGUF export, about 1.5 minutes |
+| Lab 2 | answers in a few seconds |
+| Lab 3 | the agent finishes in 10–15 s |
+| Enterprise | 300 messages ≈ 4 min · 100 invoices ≈ 10 min · 30 calls ≈ 4 min |
 
-On a DGX Spark (GB10, DGX OS 24.04, Ollama 0.34.3, NemoClaw v0.0.124 with OpenClaw 2026.7.1):
+Every change is also tested on GitHub's Windows-on-Arm machines (CPU only, small models) by [.github/workflows/windows.yml](.github/workflows/windows.yml): the one command, setup, every lab, and both pages in Edge.
 
-- **The one command from an empty folder** passed every step, and the final end-to-end check passed for all labs; running it again updated through git and passed again. The enterprise step's engine test processes messages, invoices and calls (for example 9 of 9 checklist items right, transcripts 90–92 % word-accurate).
-- **Lab 1:** 86 examples × 5 epochs = 55 steps in 37 s, 70 s including the merge and the GGUF export; the tuned model answers *"Tôi là Aurora, trợ lý kỹ thuật AI của Aurora Grid Systems…"*.
-- **Lab 2:** indexed inside the sandbox through the embeddings-only door; the guide's questions give the promised answers (25 / 35 N·m; 12 minutes with the old 5-minute rule withdrawn; no stock price) in 4–7 s.
-- **Lab 3:** the slide question passed 10 of 10 runs and all 14 example questions ended with a chart and a report through NemoClaw (16–36 s).
-- **After a restart without internet access paths:** gateway, forwards and sandbox stopped; `start.sh` brought everything back in about 50 s without onboarding, and Labs 2 and 3 answered through the sandbox.
-- **Fresh accounts:** a Spark whose account was not in the docker group stopped at "Docker is not running"; the cause (a `pipefail` check that could never see "permission denied") is fixed, and setup now adds the account and continues.
-- **Enterprise batches:** 400 messages in 2 min 13 s (180/min), 200 invoices in 5 min 38 s (35/min), 40 calls in 2 min 5 s (19/min, about 17× real time), all with accuracy against the answer keys as listed above. Running two jobs at once shares the GPU: 150 invoices and 60 calls together took about 7 minutes.
+## The DGX Spark edition
 
-</details>
-
-<details>
-<summary><b>Security notes</b></summary>
-
-- Ollama stays on `127.0.0.1`. The only non-loopback listeners are NemoClaw's token-gated proxy and the workshop's door on the Docker bridge address (embeddings, plus chat for one extra model). The batch engine listens on loopback only.
-- The `analyst` agent has no shell, file or web tools; the app validates every tool call.
-- OpenClaw's own agent (the challenge) keeps its full tool set inside the sandbox, with network access limited by NemoClaw's policy. The `/openclaw` link carries the gateway token and is only served to a browser on the Spark itself; the token is stored in `.run/gateway-token` (mode 600).
-- The enterprise demos only use invented people, companies, phone numbers and tax codes; invoices are stamped "MẪU DEMO · SAMPLE".
-- Treat the box as NVIDIA's NemoClaw guidance says: a clean machine, no personal credentials on it.
-
-</details>
+The same labs first ran on an NVIDIA DGX Spark (Linux), with a NemoClaw sandbox, an OpenClaw build challenge and a vLLM batch engine: **[an6122003/nemoclaw-rag-demo](https://github.com/an6122003/nemoclaw-rag-demo)**. This repository grew out of it. It keeps that edition's Linux files (`install.sh`, `setup.sh`, `scripts/`, [START-HERE.md](START-HERE.md)) so fixes to the shared labs can move between the two; on Windows only `install.ps1` and `windows\` run.
 
 ## Repository layout
 
 ```
-install.sh · setup.sh · start.sh · stop.sh · workshop.env   the operator surface
-install.ps1 · windows/           the Windows (RTX Spark) edition: setup.ps1 · start.ps1 · stop.ps1
-START-HERE.md                    operator guide (VI/EN) · docs/Huong-dan-Workshop-AI-DGX-Spark.docx
-START-HERE-WINDOWS.md            operator guide for the Windows edition (VI/EN)
-app/                             the web app: server.py, index.html, one module per lab,
-                                 enterprise.py (batch jobs, engine, scoring), enterprise_asr.py
-hands-on-1-finetune/             train_lora.py · run_finetune.sh (Spark) · run_finetune.py (Windows) · Dockerfile · data/
-hands-on-2-rag/                  corpus/ (28 manuals) · index/ · ingestion/ · verification/
-hands-on-3-agent/                tools/ · agent/AGENTS.md · skills/ · data/
-enterprise/generate/             seeded generators: inbox.py · invoices.py · calls.py
-scripts/                         gateway relaunch, embedding door, sandbox setup, model context, pulls
-docs/                            SANDBOX-NOTES.md (NemoClaw/OpenShell findings), images/
+install.ps1 · windows\           the installer, and setup.ps1 · start.ps1 · stop.ps1 · lib.ps1
+START-HERE-WINDOWS.md            operator guide (VI/EN)
+app\                             the web app: server.py, studio.html (served at /) and index.html (/classic),
+                                 one module per lab, enterprise.py (batch jobs, engine, scoring)
+app\static\studio\               the studio page: studio.js, die.js (the chip), studio.css, i18n.js
+hands-on-1-finetune\             train_lora.py · run_finetune.py · data\
+hands-on-2-rag\                  corpus\ (28 manuals) · index\ · ingestion\ · verification\
+hands-on-3-agent\                tools\ · data\ (the sales workbook)
+enterprise\generate\             seeded generators: inbox.py · invoices.py · calls.py
+workshop.env                     settings: models, ports, the pinned Windows versions
+install.sh · setup.sh · scripts\ the DGX Spark edition's files, kept in step with it
 ```
-
-Troubleshooting and the hard-won sandbox findings (IPv6 host-gateway egress, the config guard, `TMPDIR`, never `pkill` the gateway) are in [docs/SANDBOX-NOTES.md](docs/SANDBOX-NOTES.md).
 
 ## Credits and licences
 
-The workshop code is Apache-2.0 ([LICENSE](LICENSE)). It downloads, and does not include, third-party software and models, each under its own licence: Ollama, NVIDIA NemoClaw (with OpenShell and OpenClaw), NVIDIA's PyTorch and vLLM containers, NVIDIA Nemotron and Qwen models, `nvidia/Qwen3.6-35B-A3B-NVFP4`, VinAI's PhoWhisper (BSD-3-Clause), Piper TTS (GPL-3.0, installed in its own environment) with the `vi_VN-vais1000` voice (trained on the VAIS-1000 corpus, CC BY 4.0). Bundled: Be Vietnam Pro and Saira (SIL OFL) and GSAP (GreenSock standard no-charge licence). All companies, people and data in the labs and demos are invented.
+The workshop code is Apache-2.0 ([LICENSE](LICENSE)). It downloads, and does not include, third-party software and models, each under its own licence: Ollama, uv, Python, PyTorch, llama.cpp, NVIDIA Nemotron and Qwen models, VinAI's PhoWhisper (BSD-3-Clause), and Piper TTS (GPL-3.0, installed in its own environment) with the `vi_VN-vais1000` voice (trained on the VAIS-1000 corpus, CC BY 4.0). Bundled: Plus Jakarta Sans and JetBrains Mono (the studio page) and Be Vietnam Pro and Saira (the classic page), all under the SIL Open Font License, and GSAP (GreenSock's standard no-charge licence). All companies, people and data in the labs and demos are invented.
 
-GIGABYTE and AI TOP are trademarks or registered trademarks of GIGA-BYTE Technology Co., Ltd. NVIDIA, the NVIDIA logo, DGX, DGX Spark, Grace Blackwell and Nemotron are trademarks and/or registered trademarks of NVIDIA Corporation in the U.S. and other countries. Other names may be trademarks of their respective owners.
+NVIDIA, the NVIDIA logo, RTX, Grace, Blackwell and Nemotron are trademarks and/or registered trademarks of NVIDIA Corporation in the U.S. and other countries. Windows is a trademark of the Microsoft group of companies. ASUS and ProArt are trademarks of ASUSTeK Computer Inc. Other names may be trademarks of their respective owners.
 
 ## About
 
-Designed and built by **An À Ha** (An · @anndaynee), Engineer & AI Product Builder, for the ACE 2026 Vietnam workshop with main speaker **Lan Hoang**.
+Designed and built by **An À Ha** (An · @anndaynee), Engineer & AI Product Builder and Tech & AI Creator. Want to work together? Write to **[annnguyen612@gmail.com](mailto:annnguyen612@gmail.com)**.
 
-[annguyen.work](https://annguyen.work) · [Work with me](https://annguyen.work/proposal/) · [GitHub @an6122003](https://github.com/an6122003)
+[annguyen.work](https://annguyen.work) · [Work with me](https://annguyen.work/proposal/) · [LinkedIn](https://linkedin.com/in/an-nguyen-quoc) · [GitHub @an6122003](https://github.com/an6122003) · [YouTube @anndaynee](https://www.youtube.com/@anndaynee) · [TikTok @anndaynee](https://www.tiktok.com/@anndaynee)

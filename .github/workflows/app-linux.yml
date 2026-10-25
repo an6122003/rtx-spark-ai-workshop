@@ -6,7 +6,7 @@ name: App on Linux
 
 on:
   push:
-    branches: [main, windows]
+    branches: [main]
     paths:
       - app/**
       - hands-on-3-agent/**

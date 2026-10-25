@@ -7,7 +7,7 @@
 #
 #  The install command runs it (PowerShell):    Lệnh cài đặt sẽ chạy tệp này:
 #
-#      irm https://raw.githubusercontent.com/an6122003/nemoclaw-rag-demo/windows/install.ps1 | iex
+#      irm https://raw.githubusercontent.com/an6122003/rtx-spark-ai-workshop/main/install.ps1 | iex
 #
 #  or again, from the workshop folder:          hoặc chạy lại trong thư mục workshop:
 #

@@ -60,7 +60,7 @@ Dán lệnh này (chuột phải để dán) rồi nhấn **Enter**:
 Paste this command (right-click pastes) and press **Enter**:
 
 ```powershell
-irm https://raw.githubusercontent.com/an6122003/nemoclaw-rag-demo/windows/install.ps1 | iex
+irm https://raw.githubusercontent.com/an6122003/rtx-spark-ai-workshop/main/install.ps1 | iex
 ```
 
 Lệnh này tải workshop về thư mục `ai-workshop` trong thư mục người dùng, cài mọi thứ,

@@ -81,9 +81,8 @@ $TorchCudaIndex = Get-Setting 'WIN_TORCH_CUDA_INDEX' 'https://pypi.nvidia.com/nv
 $TorchCpu = Get-Setting 'WIN_TORCH_CPU' 'torch==2.9.1+cpu'
 $TorchCpuIndex = Get-Setting 'WIN_TORCH_CPU_INDEX' 'https://download.pytorch.org/whl/cpu'
 
-$Repo = 'an6122003/nemoclaw-rag-demo'
-# The Windows edition's branch (install.ps1 installs it by default); main once it is merged.
-$InstallCmd = "irm https://raw.githubusercontent.com/$Repo/windows/install.ps1 | iex"
+$Repo = 'an6122003/rtx-spark-ai-workshop'
+$InstallCmd = "irm https://raw.githubusercontent.com/$Repo/main/install.ps1 | iex"
 $OllamaDir = Join-Path $Run 'ollama'
 $VenvPy = Join-Path $Root '.venv\Scripts\python.exe'
 $HubUrl = "http://127.0.0.1:$HubPort/"

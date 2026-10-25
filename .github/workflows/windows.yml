@@ -7,7 +7,7 @@ name: Windows on Arm
 
 on:
   push:
-    branches: [main, windows]
+    branches: [main]
     paths:
       - install.ps1
       - windows/**
@@ -63,6 +63,7 @@ jobs:
         shell: powershell
         env:
           WORKSHOP_BRANCH: ${{ github.event.pull_request.head.sha || github.sha }}   # this exact commit
+          WORKSHOP_REPO: ${{ github.repository }}
           WORKSHOP_YES: '1'
           WORKSHOP_NO_START: '1'
           WORKSHOP_TEST: '1'

@@ -2,17 +2,18 @@
 #
 # RTX Spark AI Workshop - install or update on Windows. In PowerShell:
 #
-#     irm https://raw.githubusercontent.com/an6122003/nemoclaw-rag-demo/windows/install.ps1 | iex
+#     irm https://raw.githubusercontent.com/an6122003/rtx-spark-ai-workshop/main/install.ps1 | iex
 #
 # Downloads the workshop into %USERPROFILE%\ai-workshop (or updates it there,
 # keeping Ollama, the models, local settings and results), then runs
 # windows\setup.ps1. No administrator rights needed. The DGX Spark (Linux)
-# edition installs with install.sh instead.
+# edition lives in github.com/an6122003/nemoclaw-rag-demo.
 #
 # Options, through the environment (set them before the command):
 #   $env:WORKSHOP_DIR      install folder (default: ~\ai-workshop)
-#   $env:WORKSHOP_BRANCH   branch to install (default: windows, the Windows edition's
-#                          branch until it is merged into main), or a full commit id
+#   $env:WORKSHOP_BRANCH   branch to install (default: main), or a full commit id
+#   $env:WORKSHOP_REPO     GitHub repository to install from (default:
+#                          an6122003/rtx-spark-ai-workshop; a fork works too)
 #   $env:WORKSHOP_YES=1 / WORKSHOP_NO_START=1 / WORKSHOP_CHECK_ONLY=1 /
 #   WORKSHOP_SKIP_ENTERPRISE=1 / WORKSHOP_TEST=1
 #                          the -Yes / -NoStart / -CheckOnly / -SkipEnterprise / -Test switches of setup.ps1
@@ -27,11 +28,11 @@
         [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
     } catch {}
 
-    $repo = 'an6122003/nemoclaw-rag-demo'
-    $branch = if ($env:WORKSHOP_BRANCH) { $env:WORKSHOP_BRANCH } else { 'windows' }
+    $repo = if ($env:WORKSHOP_REPO) { $env:WORKSHOP_REPO } else { 'an6122003/rtx-spark-ai-workshop' }
+    $branch = if ($env:WORKSHOP_BRANCH) { $env:WORKSHOP_BRANCH } else { 'main' }
     $dir = if ($env:WORKSHOP_DIR) { $env:WORKSHOP_DIR } else { Join-Path $HOME 'ai-workshop' }
     if ($env:OS -ne 'Windows_NT') {
-        Write-Host '   This installer is for Windows. On the DGX Spark use install.sh.' -ForegroundColor Red
+        Write-Host '   This installer is for Windows. The DGX Spark (Linux) edition: github.com/an6122003/nemoclaw-rag-demo' -ForegroundColor Red
         return
     }
 
