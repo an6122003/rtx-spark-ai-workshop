@@ -54,7 +54,28 @@ def setting(key: str, default: str = "") -> str:
     return os.environ.get(key) or _FILE.get(key) or default
 
 
+def save_local_setting(key: str, value: str) -> None:
+    """Remember a value for this machine in workshop.local.env (the model picked on the page,
+    which windows\\setup.ps1 and start.ps1 then use too), keeping the file's other lines."""
+    path = ROOT / "workshop.local.env"
+    lines = path.read_text(encoding="utf-8").splitlines() if path.exists() else []
+    out, done = [], False
+    for line in lines:
+        if line.strip().partition("=")[0].strip() == key and not line.lstrip().startswith("#"):
+            if not done:
+                out.append(f"{key}={value}")
+                done = True
+            continue
+        out.append(line)
+    if not done:
+        out.append(f"{key}={value}")
+    path.write_text("\n".join(out) + "\n", encoding="utf-8")
+    _FILE[key] = value
+
+
 OLLAMA = setting("OLLAMA_URL", "http://127.0.0.1:11434").rstrip("/")
+# The chat model of Labs 2 and 3. The studio page can switch it while the app
+# runs (server.select_model), so read it as common.CHAT_MODEL at call time.
 CHAT_MODEL = setting("CHAT_MODEL", "nemotron-3.5-lightning:30b-a3b")
 EMBED_MODEL = setting("EMBED_MODEL", "qwen3-embedding:4b")
 # A second model participants can pick in OpenClaw's own chat (/model qwen).

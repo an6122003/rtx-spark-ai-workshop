@@ -22,7 +22,8 @@ import time
 import urllib.error
 import urllib.request
 
-from common import (CHAT_MODEL, EMBED_MODEL, NEMOCLAW_LOCK, OLLAMA, ROOT, RUN_DIR, SANDBOX,
+import common
+from common import (EMBED_MODEL, NEMOCLAW_LOCK, OLLAMA, ROOT, RUN_DIR, SANDBOX,
                     SANDBOX_ON, nemoclaw_env, ollama_chat_stream)
 
 LAB = ROOT / "hands-on-2-rag"
@@ -302,7 +303,7 @@ def ask_stream(question: str, lang: str, k: int, mode: str, emit) -> None:
     emit({"event": "step", "id": "generate"})
     parts, err = [], ""
     try:
-        for piece in ollama_chat_stream(CHAT_MODEL, messages_for(question, passages, lang),
+        for piece in ollama_chat_stream(common.CHAT_MODEL, messages_for(question, passages, lang),
                                         {"temperature": 0.1, "num_predict": 500}):
             parts.append(piece)
             emit({"event": "delta", "text": piece})
