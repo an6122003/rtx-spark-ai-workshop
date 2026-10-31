@@ -23,9 +23,10 @@ by **[An À Ha](https://annguyen.work)** · Engineer & AI Product Builder · Tec
 ## Highlights
 
 - **From a new laptop to a checked demo with one command.** No administrator rights, Developer Mode or WSL. The installer sets up Ollama, Python, NVIDIA's CUDA build of PyTorch for Windows on Arm, llama.cpp and about 58 GB of models. It trains the example model once, runs every lab end to end and adds a desktop shortcut. Running it again updates the files and skips finished steps, so an update takes under a minute.
+- **Models that fit the machine.** Setup reads the computer (the NVIDIA GPU and its memory, or memory shared with the CPU, the RAM and the free disk) and only offers chat models it can run: NVIDIA Nemotron 3.5 Lightning on an RTX Spark, smaller Qwen3 models on smaller laptops. The studio page's **Models** section shows the same plan, downloads a model and switches Labs 2 and 3 to it; a model too large for the machine is locked.
 - **Three hands-on labs**, each with a live before-and-after comparison: a LoRA fine-tune on the laptop's GPU in about 40 seconds, RAG over 28 technical manuals, and an agent that turns a spreadsheet into a chart and an Excel report.
 - **Enterprise batch AI, measured rather than claimed.** 2,400 customer messages, 1,000 scanned invoices and 300 recorded calls run as real background jobs. Every item has an answer key, so the page shows live accuracy, throughput, GPU energy and the cost compared with cloud APIs.
-- **A page made for the machine.** The studio page shows the RTX Spark itself. NVIDIA's specifications sit next to a drawing of the chip that lights up with the GPU's real work, and next to what the laptop is doing right now. Vietnamese and English, no event branding, and no internet needed after setup.
+- **A page made for the machine.** The studio page shows the RTX Spark itself. NVIDIA's specifications sit next to a drawing of the chip that lights up with the GPU's real work, and next to what the laptop is doing right now. Vietnamese and English, in NVIDIA's look (black pages, NVIDIA green, bold type), and no internet needed after setup.
 
 ## Demo videos
 
@@ -106,10 +107,10 @@ The batch engine is llama.cpp's `llama-server` with Qwen3.6-35B-A3B (a 4-bit GGU
 | 1 | Check the computer | Windows 11 on Arm, the NVIDIA GPU and its driver, memory, disk, internet; warns about Smart App Control and running on battery, and keeps the laptop awake until it finishes |
 | 2 | Python | `uv` with Python 3.13 for Arm64, in the workshop's own folder |
 | 3 | Ollama | a pinned release unpacked into the workshop folder, so it cannot update itself before an event |
-| 4 | Models | `nemotron-3.5-lightning:30b-a3b`, `qwen3-embedding:4b`, `qwen2.5:1.5b-instruct`; a 32,768-token context for the chat model |
+| 4 | Models | reads the hardware (`app\hardware.py`) and picks the chat model for it: `nemotron-3.5-lightning:30b-a3b` on an RTX Spark, a smaller Qwen3 elsewhere (Enter takes the recommendation, a number picks another that fits); `qwen3-embedding:4b`, `qwen2.5:1.5b-instruct`; a 32,768-token context, 16,384 where memory is short. The choice is kept in `workshop.local.env` |
 | 5 | Lab 1 | NVIDIA's CUDA build of PyTorch for Windows on Arm, llama.cpp's GGUF converter, the base model cached for offline training; trains `aurora-assistant` once |
 | 6 | Lab 2 | builds the document index (82 passages) with the embedding model |
-| 7 | Enterprise | about 25 GB: llama.cpp with CUDA, the Qwen3.6-35B-A3B GGUF and its vision projector, Piper with a Vietnamese voice, PhoWhisper; generates the messages, invoices and recorded calls, then checks the batch engine once |
+| 7 | Enterprise | only where the machine can spare about 32 GB of GPU or unified memory (`$env:WORKSHOP_FORCE_ENTERPRISE = 1` overrides); about 25 GB: llama.cpp with CUDA, the Qwen3.6-35B-A3B GGUF and its vision projector, Piper with a Vietnamese voice, PhoWhisper; generates the messages, invoices and recorded calls, then checks the batch engine once |
 | 8 | Final check | runs every lab end to end with the real models, prints a summary and adds the desktop shortcut |
 
 Every step checks the real state first, so running it again is safe. Everything is logged to `setup-log.txt` in the workshop folder. Options, set before the command:
@@ -127,7 +128,7 @@ Settings such as the models and ports live in [workshop.env](workshop.env); put 
 ## Requirements and verified runs
 
 - An **NVIDIA RTX Spark** PC with Windows 11 and a current NVIDIA driver; internet for setup only.
-- About **70 GB** free. About 58 GB is downloaded: 40 minutes on a fast connection, up to 2 hours on a slow one.
+- About **70 GB** free for everything on an RTX Spark (at least 20 GB: smaller machines get smaller models and skip the batch demos). Up to 58 GB is downloaded: 40 minutes on a fast connection, up to 2 hours on a slow one.
 
 Verified on an ASUS ProArt P16 (NVIDIA RTX Spark N1X, 128 GB, Windows 11 build 28000, driver 617.69). The first install took 38 minutes on about 350 Mbit/s with all four parts ready, and an update takes about 40 seconds. Measured during a session:
 
@@ -163,7 +164,7 @@ install.sh · setup.sh · scripts\ the DGX Spark edition's files, kept in step w
 
 ## Credits and licences
 
-The workshop code is Apache-2.0 ([LICENSE](LICENSE)). It downloads, and does not include, third-party software and models, each under its own licence: Ollama, uv, Python, PyTorch, llama.cpp, NVIDIA Nemotron and Qwen models, VinAI's PhoWhisper (BSD-3-Clause), and Piper TTS (GPL-3.0, installed in its own environment) with the `vi_VN-vais1000` voice (trained on the VAIS-1000 corpus, CC BY 4.0). Bundled: Plus Jakarta Sans and JetBrains Mono (the studio page) and Be Vietnam Pro and Saira (the classic page), all under the SIL Open Font License, and GSAP (GreenSock's standard no-charge licence). The demo videos' music and sound effects were made with ElevenLabs. All companies, people and data in the labs and demos are invented.
+The workshop code is Apache-2.0 ([LICENSE](LICENSE)). It downloads, and does not include, third-party software and models, each under its own licence: Ollama, uv, Python, PyTorch, llama.cpp, NVIDIA Nemotron and Qwen models, VinAI's PhoWhisper (BSD-3-Clause), and Piper TTS (GPL-3.0, installed in its own environment) with the `vi_VN-vais1000` voice (trained on the VAIS-1000 corpus, CC BY 4.0). Bundled: Be Vietnam Pro and JetBrains Mono (the studio page, Be Vietnam Pro standing in for NVIDIA Sans), Be Vietnam Pro and Saira (the classic page), and Plus Jakarta Sans, all under the SIL Open Font License, and GSAP (GreenSock's standard no-charge licence). The demo videos' music and sound effects were made with ElevenLabs. All companies, people and data in the labs and demos are invented.
 
 NVIDIA, the NVIDIA logo, RTX, Grace, Blackwell and Nemotron are trademarks and/or registered trademarks of NVIDIA Corporation in the U.S. and other countries. Windows is a trademark of the Microsoft group of companies. ASUS and ProArt are trademarks of ASUSTeK Computer Inc. Other names may be trademarks of their respective owners.
 
