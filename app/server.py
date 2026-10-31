@@ -45,6 +45,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import common  # noqa: E402
 import enterprise as ent  # noqa: E402
+import hardware  # noqa: E402
 import lab1_finetune as lab1  # noqa: E402
 import lab2_rag as lab2  # noqa: E402
 import lab3_agent as lab3  # noqa: E402
@@ -66,7 +67,17 @@ EDITION_MARK = b"<!--WORKSHOP-EDITION-->"
 def features() -> dict:
     """What this machine offers, so the page shows only the parts that work here."""
     return {"sandbox": common.SANDBOX_ON, "openclaw": common.SANDBOX_ON,
-            "enterprise": ent.available(), "lab1_train": lab1.TRAIN_AVAILABLE}
+            "enterprise": ent.available(), "lab1_train": lab1.TRAIN_AVAILABLE,
+            # Picking the chat model on the page: not with a sandbox, whose route setup fixed.
+            "models": not common.SANDBOX_ON, "spark": _looks_like_spark()}
+
+
+def _looks_like_spark() -> bool:
+    """Show the studio's RTX Spark section unless the hardware is clearly another machine:
+    a discrete GPU, a Mac, or an x64 PC without an NVIDIA GPU (the RTX Spark is Windows on Arm)."""
+    hw = hardware.machine()
+    other_cpu = hw["kind"] == "cpu" and hw["arch"].lower() in ("amd64", "x86_64")
+    return not (hw["kind"] == "discrete" or sys.platform == "darwin" or other_cpu)
 
 
 def page_config() -> bytes:
@@ -78,7 +89,8 @@ def page_config() -> bytes:
     cfg = {"edition": common.EDITION, "device": common.DEVICE, "features": features()}
     js = ("window.WORKSHOP=" + json.dumps(cfg) + ";(function(f,c){c.add('ed-'+window.WORKSHOP.edition);"
           "if(!f.sandbox)c.add('no-sandbox');if(!f.openclaw)c.add('no-openclaw');"
-          "if(!f.enterprise)c.add('no-ent');})(window.WORKSHOP.features,document.documentElement.classList);")
+          "if(!f.enterprise)c.add('no-ent');if(!f.spark)c.add('no-spark');if(!f.models)c.add('no-models');})"
+          "(window.WORKSHOP.features,document.documentElement.classList);")
     return b"<script>" + js.encode("utf-8") + b"</script>"
 
 
@@ -202,6 +214,87 @@ def telemetry() -> dict:
         return value
 
 
+# --------------------------------------------------------------------------
+# The chat model: what fits this machine (hardware.py), downloading one, and
+# switching Labs 2 and 3 to it while the app runs.
+# --------------------------------------------------------------------------
+SWITCH = {"model": "", "busy": False}
+
+
+def models_state(local: bool) -> dict:
+    up = common.ollama_up(timeout=2)
+    installed = common.ollama_models() if up else set()
+    p = hardware.plan(installed, common.CHAT_MODEL)
+    if not hardware.catalog_entry(common.CHAT_MODEL):  # set by hand in workshop.local.env: show it as it is
+        p["models"].insert(0, {"id": common.CHAT_MODEL, "name": common.CHAT_MODEL, "maker": "", "params": "",
+                               "size_gb": None, "status": "custom", "installed": common.has_model(common.CHAT_MODEL),
+                               "active": True})
+    p.update(ollama=up, active=common.CHAT_MODEL, active_ready=up and common.has_model(common.CHAT_MODEL),
+             pull=hardware.PULL.snapshot(), switching=dict(SWITCH), can_change=local and not common.SANDBOX_ON)
+    return p
+
+
+def select_model(tag: str) -> tuple[bool, str]:
+    """Make an installed model that fits this machine the chat model of Labs 2 and 3."""
+    entry = hardware.catalog_entry(tag)
+    if common.SANDBOX_ON:
+        return False, "sandbox_edition"
+    if not entry:
+        return False, "not_in_catalog"
+    common.forget_models_cache()
+    if not common.has_model(tag):
+        return False, "not_installed"
+    fit = hardware.judge(entry, hardware.machine(), installed=True)
+    if not hardware.allowed(fit["status"]):
+        return False, fit["status"]
+    before = common.CHAT_MODEL
+    common.CHAT_MODEL = tag
+    try:
+        common.save_local_setting("CHAT_MODEL", tag)  # setup and start.ps1 keep it
+    except OSError:
+        pass
+
+    def prepare() -> None:
+        SWITCH.update(model=tag, busy=True)
+        try:
+            if before != tag:  # give the previous model's memory back first
+                try:
+                    common.http_json(f"{common.OLLAMA}/api/generate", {"model": before, "keep_alive": 0}, timeout=30)
+                except Exception:
+                    pass
+            # Room for Hands-on 3's tool list and data preview, as setup gives it (nothing downloaded).
+            subprocess.run([sys.executable, str(common.ROOT / "scripts" / "ollama-context.py"), tag, str(hardware.context_for(tag))],
+                           capture_output=True, timeout=600)
+            common.ollama_warm(tag)
+        except Exception:
+            pass
+        finally:
+            SWITCH.update(busy=False)
+
+    threading.Thread(target=prepare, daemon=True).start()
+    return True, "selected"
+
+
+def start_pull(tag: str) -> tuple[bool, str]:
+    """Download a catalog model, only if this machine can hold it; it becomes the chat model."""
+    entry = hardware.catalog_entry(tag)
+    if common.SANDBOX_ON:
+        return False, "sandbox_edition"
+    if not entry:
+        return False, "not_in_catalog"
+    if not common.ollama_up(timeout=3):
+        return False, "ollama_off"
+    common.forget_models_cache()
+    if common.has_model(tag):
+        return select_model(tag)
+    hw = hardware.machine(max_age=0)
+    real = hardware.registry_size_gb(tag)  # the registry's figure, when it answers, over the catalog's
+    fit = hardware.judge({**entry, "size_gb": real or entry["size_gb"]}, hw)
+    if not hardware.allowed(fit["status"]):
+        return False, fit["status"]
+    return hardware.PULL.start(tag, on_done=select_model)
+
+
 class Handler(BaseHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
     server_version = "DGXWorkshop/1.0"
@@ -306,6 +399,8 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(200, health(include_token=self._local()))
         if path == "/api/telemetry":
             return self._json(200, telemetry())
+        if path == "/api/models":
+            return self._json(200, models_state(self._local()))
 
         if path == "/openclaw":  # short address for OpenClaw's own UI (the challenge)
             if not common.SANDBOX_ON:
@@ -432,6 +527,14 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(400, {"error": f"bad request: {exc}"})
 
         lang = req.get("lang") if req.get("lang") in ("en", "vi") else "vi"
+
+        # ---- The chat model (only from a browser on this machine: it downloads and changes the labs)
+        if path in ("/api/models/pull", "/api/models/select"):
+            if not self._local():
+                return self._json(403, {"ok": False, "detail": "local_only"})
+            tag = str(req.get("model") or "")
+            ok, why = start_pull(tag) if path.endswith("/pull") else select_model(tag)
+            return self._json(200 if ok else 409, {"ok": ok, "detail": why})
 
         # ---- Hands-on 1
         if path == "/api/lab1/train":

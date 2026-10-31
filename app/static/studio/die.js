@@ -331,18 +331,18 @@
     }
     ctx.save();
     ctx.translate(0, 2.2 * px);
-    ctx.strokeStyle = 'rgba(27,26,25,0.07)';
+    ctx.strokeStyle = 'rgba(0,0,0,0.6)';
     for (const tr of traces) { ctx.lineWidth = tr.w * tw + 1.8 * px; strokeTrace(tr, tr.len * grow); }
     ctx.restore();
-    ctx.strokeStyle = '#ffffff';
+    ctx.strokeStyle = '#262626';
     for (const tr of traces) { ctx.lineWidth = tr.w * tw; strokeTrace(tr, tr.len * grow); }
     // vias at the ends
     if (grow > 0.98) {
       for (const tr of traces) {
         const [x, y] = tr.pts[tr.pts.length - 1], w = tr.w * tw;
-        ctx.beginPath(); ctx.arc(x, y + 1.6 * px, w * 1.7, 0, Math.PI * 2); ctx.fillStyle = 'rgba(27,26,25,0.08)'; ctx.fill();
-        ctx.beginPath(); ctx.arc(x, y, w * 1.7, 0, Math.PI * 2); ctx.fillStyle = '#ffffff'; ctx.fill();
-        ctx.beginPath(); ctx.arc(x, y, w * 0.6, 0, Math.PI * 2); ctx.fillStyle = 'rgba(27,26,25,0.16)'; ctx.fill();
+        ctx.beginPath(); ctx.arc(x, y + 1.6 * px, w * 1.7, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fill();
+        ctx.beginPath(); ctx.arc(x, y, w * 1.7, 0, Math.PI * 2); ctx.fillStyle = '#333333'; ctx.fill();
+        ctx.beginPath(); ctx.arc(x, y, w * 0.6, 0, Math.PI * 2); ctx.fillStyle = '#0a0a0a'; ctx.fill();
       }
     }
 
@@ -375,20 +375,20 @@
 
     // the package
     ctx.save();
-    ctx.shadowColor = 'rgba(27,26,25,0.20)';
+    ctx.shadowColor = 'rgba(0,0,0,0.8)';
     ctx.shadowBlur = 46 * s * dpr;
     ctx.shadowOffsetY = 20 * s * dpr;
     roundRect(-PKG, -PKG, PKG * 2, PKG * 2, 16);
-    ctx.fillStyle = '#ffffff';
+    ctx.fillStyle = '#141414';
     ctx.fill();
     ctx.restore();
     const pg = ctx.createLinearGradient(-PKG, -PKG, PKG, PKG);
-    pg.addColorStop(0, '#ffffff'); pg.addColorStop(1, '#efede8');
+    pg.addColorStop(0, '#1d1d1d'); pg.addColorStop(1, '#0b0b0b');
     roundRect(-PKG, -PKG, PKG * 2, PKG * 2, 16);
     ctx.fillStyle = pg; ctx.fill();
-    ctx.lineWidth = px; ctx.strokeStyle = 'rgba(27,26,25,0.12)'; ctx.stroke();
+    ctx.lineWidth = px; ctx.strokeStyle = 'rgba(255,255,255,0.14)'; ctx.stroke();
     // pins where the traces leave
-    ctx.fillStyle = '#d8d5ce';
+    ctx.fillStyle = '#3a3a3a';
     for (const tr of traces) {
       const [x, y] = tr.pts[0];
       const horiz = Math.abs(x) >= PKG - 0.5;
@@ -396,21 +396,21 @@
     }
     // engraving
     if (spec.label) {
-      ctx.fillStyle = 'rgba(27,26,25,0.32)';
-      ctx.font = '600 7px "Plus Jakarta Sans", sans-serif';
+      ctx.fillStyle = 'rgba(255,255,255,0.4)';
+      ctx.font = '700 7px "Be Vietnam Pro", Arial, sans-serif';
       ctx.textAlign = 'right';
       ctx.fillText(spec.label.toUpperCase(), PKG - 12, PKG - 12);
       ctx.textAlign = 'left';
     }
     // the die
     roundRect(-DIE - 4, -DIE - 4, DIE * 2 + 8, DIE * 2 + 8, 6);
-    ctx.fillStyle = '#e9e7e1'; ctx.fill();
-    ctx.lineWidth = px; ctx.strokeStyle = 'rgba(27,26,25,0.14)'; ctx.stroke();
+    ctx.fillStyle = '#0e0e0e'; ctx.fill();
+    ctx.lineWidth = px; ctx.strokeStyle = 'rgba(255,255,255,0.16)'; ctx.stroke();
     for (const c of cells) {
       const h = clamp(c.heat + c.base, 0, 1.2);
       ctx.fillStyle = h > 0.02
-        ? `rgb(${Math.round(lerp(220, NV[0], Math.min(1, h)))},${Math.round(lerp(218, NV[1], Math.min(1, h)))},${Math.round(lerp(211, NV[2], Math.min(1, h)))})`
-        : (c.kind === 'mem' ? '#cfccc4' : c.kind === 'cache' ? '#d9d6cf' : c.kind === 'npu' ? '#dad8d1' : '#dedcd5');
+        ? `rgb(${Math.round(lerp(40, NV[0], Math.min(1, h)))},${Math.round(lerp(40, NV[1], Math.min(1, h)))},${Math.round(lerp(40, NV[2], Math.min(1, h)))})`
+        : (c.kind === 'mem' ? '#2e2e2e' : c.kind === 'cache' ? '#262626' : c.kind === 'npu' ? '#2a2a2a' : '#232323');
       ctx.fillRect(c.x, c.y, c.w, c.h);
     }
     for (const c of cells) {
@@ -423,13 +423,13 @@
     ctx.globalAlpha = cam.alpha;
     if (hover && regions[hover] && hoverAmt > 0.02) {
       const r = regions[hover];
-      ctx.strokeStyle = `rgba(200,161,107,${0.9 * hoverAmt})`;
+      ctx.strokeStyle = `rgba(118,185,0,${0.95 * hoverAmt})`;
       ctx.lineWidth = 1.6 * px;
       roundRect(r.x - 2.5, r.y - 2.5, r.w + 5, r.h + 5, 2.5);
       ctx.stroke();
     }
     if (inspecting === 'pkg') {  // the whole chip is the subject
-      ctx.strokeStyle = 'rgba(200,161,107,0.9)';
+      ctx.strokeStyle = 'rgba(118,185,0,0.95)';
       ctx.lineWidth = 2 * px;
       roundRect(-PKG - 8, -PKG - 8, PKG * 2 + 16, PKG * 2 + 16, 20);
       ctx.stroke();
@@ -453,7 +453,7 @@
       ['npu', -58, 58, -1, 1, 'NPU'],
       ['pkg', PKG, PKG, 1, 1, spec.label || 'Superchip', [PKG, -PKG, 1, -1]],
     ].filter(it => (inspecting ? it[0] === inspecting : it[0] !== 'npu' && it[0] !== 'pkg'));
-    ctx.font = inspecting ? '700 13px "Plus Jakarta Sans", sans-serif' : '600 11px "Plus Jakarta Sans", sans-serif';
+    ctx.font = inspecting ? '700 13px "Be Vietnam Pro", Arial, sans-serif' : '600 11px "Be Vietnam Pro", Arial, sans-serif';
     ctx.textBaseline = 'middle';
     for (const it of items) {
       // up close the label goes above the block: the page keeps its live readout below it
@@ -465,17 +465,17 @@
       const ey = inspecting ? ay + sy * 46 : ay + sy * (reach * 0.35 + 26);
       const a = cam.alpha * cam.labels * clamp((boot - 0.6) * 2.5, 0, 1);
       ctx.globalAlpha = a;
-      ctx.strokeStyle = on > 0.05 ? `rgba(200,161,107,${0.6 + 0.4 * on})` : 'rgba(27,26,25,0.28)';
+      ctx.strokeStyle = on > 0.05 ? `rgba(118,185,0,${0.6 + 0.4 * on})` : 'rgba(255,255,255,0.28)';
       ctx.lineWidth = 1;
       let tx = sx;  // the words go to the other side when this one has no room for them
       const tw = ctx.measureText(text).width;
       if (tx > 0 && ex + 24 + tw > vw - 8) tx = -1;
       else if (tx < 0 && ex - 24 - tw < 8) tx = 1;
       ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(ex, ey); ctx.lineTo(ex + tx * 18, ey); ctx.stroke();
-      ctx.fillStyle = on > 0.05 ? '#9a7546' : 'rgba(27,26,25,0.62)';
+      ctx.fillStyle = on > 0.05 ? '#76b900' : 'rgba(255,255,255,0.66)';
       ctx.textAlign = tx > 0 ? 'left' : 'right';
       ctx.fillText(text, ex + tx * 24, ey);
-      ctx.beginPath(); ctx.arc(ax, ay, 2.2, 0, Math.PI * 2); ctx.fillStyle = on > 0.05 ? '#c8a16b' : 'rgba(27,26,25,0.45)'; ctx.fill();
+      ctx.beginPath(); ctx.arc(ax, ay, 2.2, 0, Math.PI * 2); ctx.fillStyle = on > 0.05 ? '#76b900' : 'rgba(255,255,255,0.45)'; ctx.fill();
     }
     ctx.textAlign = 'left';
   }

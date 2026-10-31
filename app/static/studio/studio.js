@@ -1,4 +1,4 @@
-/* Studio: the workshop page for RTX Spark laptops (brand-neutral).
+/* Studio: the workshop page for RTX Spark laptops, in NVIDIA's look.
  *
  * The same labs and API as the classic page (index.html), with its own look:
  * chapters instead of tabs, a living chip behind the page (die.js) that lights
@@ -111,7 +111,7 @@
   function scramble(el, text, dur) {
     if (!el) return;
     el.textContent = text;
-    if (MOTION) finishSoon(gsap.fromTo(el, {letterSpacing: '0.5em', autoAlpha: 0}, {letterSpacing: '0.22em', autoAlpha: 1, duration: dur || 1.2, ease: 'expo.out', clearProps: 'letterSpacing,opacity,visibility'}), 2400);
+    if (MOTION) finishSoon(gsap.fromTo(el, {letterSpacing: '0.4em', autoAlpha: 0}, {letterSpacing: '0em', autoAlpha: 1, duration: dur || 1.2, ease: 'expo.out', clearProps: 'letterSpacing,opacity,visibility'}), 2400);
   }
   function countTo(el, to, fmt) {
     if (!el) return;
@@ -154,7 +154,7 @@
     $('#f2-search-d').textContent = t(FEAT.sandbox ? 'f2_search_d_sb' : 'f2_search_d');
     $('#f3-nc').textContent = t(FEAT.sandbox ? 'f3_nc_sb' : 'f3_nc');
     $$('.langs button').forEach(b => b.classList.toggle('on', b.dataset.lang === LANG));
-    renderHome(); mxRender(); lab1Render(); lab2Examples(); lab2Map(); lab2Steps(L2.step || 'idle'); lab3Render();
+    renderHome(); mxRender(); modelsRender(); lab1Render(); lab2Examples(); lab2Map(); lab2Steps(L2.step || 'idle'); lab3Render();
     if (window.Die) Die.configure({names: dieNames()});
     ENT.built = ''; ENT.costBuilt = ''; entRender();
     if (L2.last) lab2Answer(L2.last);
@@ -522,6 +522,114 @@
     }, {threshold: [0, 0.2, 0.4]}).observe($('#machine'));
   }
 
+  /* ---------------------------------------------------------- models --- */
+  // What this machine is (the app reads it, hardware.py) and the chat models that fit it. A model is
+  // downloaded and Labs 2 and 3 switch to it; one the machine cannot hold is locked.
+  const MD = {data: null, timer: 0, pull: null};
+  const GB = v => (v == null ? '—' : num(v, v >= 10 ? 0 : 1) + ' GB');
+  const MD_ERR = {busy: 'md_err_busy', too_big: 'md_err_too_big', no_disk: 'md_err_no_disk', ollama_off: 'md_alert_off', local_only: 'md_local'};
+  async function modelsLoad() {
+    if (FEAT.models === false) return;
+    clearTimeout(MD.timer);
+    try { MD.data = await getJSON('/api/models'); } catch (e) { MD.data = null; }
+    const d = MD.data || {}, p = d.pull || {};
+    if (MD.pull && MD.pull.running && !p.running && p.model === MD.pull.model) {  // a download just ended
+      if (p.done) { toast(t('md_toast_done', {m: p.model})); health(); }
+      else toast(t('md_dl_failed', {m: p.model, e: p.error || ''}));
+    }
+    MD.pull = p;
+    modelsRender();
+    const live = p.running || (d.switching && d.switching.busy);
+    MD.timer = setTimeout(modelsLoad, live ? 1000 : 15000);
+  }
+  function modelsRender() {
+    if (FEAT.models === false) return;
+    const d = MD.data;
+    setHTML($('#md-hw'), modelsHw(d));
+    if (!d || !d.models) { setHTML($('#md-rows'), ''); return; }
+    const ok = d.models.filter(m => m.status === 'fits' || m.status === 'slow');
+    $('#md-count').textContent = t('md_count', {n: ok.length, t: d.models.filter(m => m.status !== 'custom').length});
+    const active = d.models.find(m => m.active) || {};
+    const rec = d.models.find(m => m.id === d.recommended);
+    let alert = '';
+    if (!d.ollama) alert = `<p class="md-alert bad">${lamp('bad')}<span>${esc(t('md_alert_off'))}</span></p>`;
+    else if (rec && (!d.active_ready || active.status === 'too_big')) {
+      alert = `<div class="md-alert">${lamp('warn')}<span>${esc(t(d.active_ready ? 'md_alert_big' : 'md_alert_missing', {m: d.active}))}</span>` +
+        (d.can_change ? `<button type="button" class="act primary" data-md-${rec.installed ? 'use' : 'pull'}="${esc(rec.id)}"${d.pull && d.pull.running ? ' disabled' : ''}>` +
+          `<span>${esc(rec.name)}</span><span class="arr">→</span></button>` : `<b>${esc(rec.name)}</b>`) + '</div>';
+    }
+    setHTML($('#md-alert'), alert);
+    // Every bar on one scale; the dashed lines are what the GPU, and the machine, can hold.
+    const b = d.budget || {};
+    const scale = Math.max(b.limit_gb || 0, ...d.models.map(m => m.need_gb || 0)) * 1.06 || 1;
+    const pos = v => (100 * Math.min(v, scale) / scale).toFixed(1) + '%';
+    const twoLines = d.hardware.kind === 'discrete' && b.limit_gb > b.fast_gb;
+    const lines = (b.fast_gb ? `<i class="ln" style="left:${pos(b.fast_gb)}"></i>` : '') + (twoLines || !b.fast_gb ? `<i class="ln max" style="left:${pos(b.limit_gb)}"></i>` : '');
+    setHTML($('#md-legend'), (b.fast_gb ? `<span><i class="ln"></i>${esc(t('md_line_gpu', {n: GB(b.fast_gb)}))}</span>` : '') +
+      (twoLines || !b.fast_gb ? `<span><i class="ln max"></i>${esc(t('md_line_max', {n: GB(b.limit_gb)}))}</span>` : ''));
+    setHTML($('#md-rows'), d.models.map(m => modelRow(m, d, pos, lines)).join(''));
+    setHTML($('#md-note'), esc(t('md_note')) + (d.can_change ? '' : ' ' + esc(t('md_local'))));
+    const lm = $('#lamp-models');
+    if (lm) lm.className = 'lamp ' + (d.active_ready ? 'on' : 'warn');
+  }
+  function modelsHw(d) {
+    const hw = d && d.hardware;
+    const head = `<div class="plate-h"><span class="lbl"><i class="lamp on"></i>${esc(t('md_hw'))}</span><span class="count">${esc(t('md_auto'))}</span></div>`;
+    if (!hw) return head + `<p class="note-s">${esc(t('md_reading'))}</p>`;
+    const b = d.budget || {}, e = d.enterprise || {};
+    const cell = (label, value, sub, wide) => `<div${wide ? ' class="wide"' : ''}><span>${esc(label)}</span><b>${esc(value)}</b>${sub ? `<em>${esc(sub)}</em>` : ''}</div>`;
+    const mem = hw.kind === 'discrete'
+      ? cell(t('md_vram'), GB(hw.vram_gb), t('md_vram_d')) + cell(t('md_ram'), GB(hw.ram_gb))
+      : cell(t('md_mem'), GB(hw.ram_gb), t(hw.kind === 'unified' ? 'md_shared' : 'md_ram_d')) + cell(t('md_disk'), GB(hw.disk_free_gb));
+    const ent = e.fits ? t('md_ent_yes') : t('md_ent_' + (e.reason || 'memory'), {n: e.need_gb || 32});
+    return head +
+      `<p class="md-big"><b>${esc(GB(b.fast_gb || b.limit_gb))}</b>${esc(t(b.fast_gb ? 'md_budget' : 'md_budget_cpu'))}</p>` +
+      '<div class="lv">' +
+      cell(t('md_gpu'), hw.gpu || t('md_none'), t('md_kind_' + hw.kind), true) + mem +
+      (hw.kind === 'discrete' ? cell(t('md_disk'), GB(hw.disk_free_gb)) : '') +
+      cell(t('md_cpu'), hw.cores ? t('md_cores', {n: hw.cores}) : '—', hw.cpu) +
+      (FEAT.enterprise !== false ? cell(t('md_ent'), ent, '', true) : '') + '</div>';
+  }
+  function modelRow(m, d, pos, lines) {
+    const st = m.status, p = d.pull || {}, sw = d.switching || {};
+    const usable = st === 'fits' || st === 'slow' || st === 'custom';
+    const pulling = p.running && p.model === m.id;
+    const chip = m.active && m.installed ? ['on', 'md_st_active'] : m.id === d.recommended ? ['ion', 'md_st_rec'] :
+      {fits: ['on', 'md_st_fits'], slow: ['warn', 'md_st_slow'], too_big: ['bad', 'md_st_too_big'], no_disk: ['bad', 'md_st_no_disk'], custom: ['', 'md_st_custom']}[st];
+    const meta = [m.params, m.size_gb != null ? t('md_dl', {n: GB(m.size_gb)}) : '', m.need_gb ? t('md_need', {n: GB(m.need_gb)}) : '',
+      m.context ? t('md_ctx', {n: Math.round(m.context / 1024)}) : ''].filter(Boolean).join(' · ');
+    let go = '';
+    if (pulling) {
+      const pct = p.total ? Math.min(100, 100 * p.completed / p.total) : 0;
+      go = `<div class="mprog"><div class="mbar"><i style="width:${pct.toFixed(1)}%"></i></div><span>${esc(p.total ? `${num(pct, 0)}% · ${GB(p.completed / 1e9)} / ${GB(p.total / 1e9)}` : t(p.status === 'retrying' ? 'md_retry' : 'md_wait'))}</span></div>`;
+    } else if (m.active && m.installed) {
+      go = `<span class="md-using">${esc(t(sw.busy && sw.model === m.id ? 'md_preparing' : 'md_using'))}</span>`;
+    } else if (!usable) {
+      go = `<span class="md-lock"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="1.6"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2"/></svg>${esc(t('md_locked'))}</span>`;
+    } else if (d.can_change && st !== 'custom') {
+      const busy = p.running ? ' disabled' : '';
+      go = m.installed ? `<button type="button" class="act ghost" data-md-use="${esc(m.id)}">${esc(t('md_use'))}</button>`
+        : `<button type="button" class="act ghost${m.id === d.recommended ? ' rec' : ''}" data-md-pull="${esc(m.id)}"${busy}>${esc(t('md_get'))}<span class="arr">↓</span></button>`;
+    }
+    const bar = m.need_gb ? `<div class="mbar ${st}"><i style="width:${pos(m.need_gb)}"></i>${lines}</div>` : '<div></div>';
+    return `<li class="mrow${usable ? '' : ' locked'}${m.active && m.installed ? ' active' : ''}">` +
+      `<div class="nm"><b>${esc(m.name)}</b>${m.maker ? `<span class="mk${m.nvidia ? ' nv' : ''}">${esc(m.maker)}</span>` : ''}` +
+      `<div class="meta"><code>${esc(m.id)}</code>${esc(meta)}</div></div>` +
+      bar + `<div class="mst">${lamp(chip[0])}<span>${esc(t(chip[1]))}</span>${st === 'slow' ? `<em>${esc(t('md_why_slow'))}</em>` : ''}</div>` +
+      `<div class="go">${go}</div></li>`;
+  }
+  $('#models').addEventListener('click', async e => {
+    const btn = e.target.closest('[data-md-pull], [data-md-use]');
+    if (!btn || btn.disabled) return;
+    const model = btn.dataset.mdPull || btn.dataset.mdUse, pull = !!btn.dataset.mdPull;
+    btn.disabled = true;
+    const r = await postJSON(pull ? '/api/models/pull' : '/api/models/select', {model});
+    if (!r.ok) toast(MD_ERR[r.detail] ? t(MD_ERR[r.detail]) : t('md_err', {d: r.detail || r.error || ''}));
+    else if (r.detail === 'started') toast(t('md_toast_start', {m: model}));
+    else { toast(t('md_toast_use', {m: model})); health(); }
+    modelsLoad();
+  });
+
   /* ------------------------------------------------- streamed answers --- */
   // Tokens arrive as glowing spans; when the answer is complete it is set as formatted text.
   function streamPut(el, text) {
@@ -736,7 +844,7 @@
       const v = min + (max - min) * f, yy = y(v).toFixed(1);
       return `<line class="gridl" x1="${PL}" x2="${W - PR}" y1="${yy}" y2="${yy}"/><text class="tick" x="0" y="${(+yy + 3.5).toFixed(1)}">${num(v, 2)}</text>`;
     }).join('');
-    svg.innerHTML = '<defs><linearGradient id="lossfill" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#ff5c22" stop-opacity=".28"/><stop offset="1" stop-color="#ff5c22" stop-opacity="0"/></linearGradient></defs>' +
+    svg.innerHTML = '<defs><linearGradient id="lossfill" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#76b900" stop-opacity=".32"/><stop offset="1" stop-color="#76b900" stop-opacity="0"/></linearGradient></defs>' +
       grid + `<polygon class="area" points="${x(0).toFixed(1)},${H - PB} ${pts} ${last[0].toFixed(1)},${H - PB}"/>` +
       `<polyline class="curve" points="${pts}"/><rect class="head" x="${(last[0] - 3.5).toFixed(1)}" y="${(last[1] - 3.5).toFixed(1)}" width="7" height="7"/>` +
       `<text class="tick" x="${W - PR}" y="${H - 6}" text-anchor="end">STEP ${ys.length} / ${n}</text>`;
@@ -1609,6 +1717,7 @@
     if (window.Die) Die.boot();
     await health();
     telemetry();
+    modelsLoad();
     setInterval(telemetry, 2000);
     await Promise.all([lab1Load(), lab2Load(), lab3Load()]);
     applyLang();

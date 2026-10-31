@@ -94,12 +94,14 @@ if ($Interactive -and -not $Yes -and -not $CheckOnly) {
     Write-Host @'
    This will download and install third-party software, each under its own
    license: Ollama, uv, Python and Python packages, llama.cpp, PyTorch, Piper
-   and open AI models (NVIDIA Nemotron, Qwen, PhoWhisper). About 58 GB is
-   downloaded. Leave this window open.
+   and open AI models (NVIDIA Nemotron, Qwen, PhoWhisper). It reads this
+   computer first and only downloads AI models that fit it: up to about 58 GB.
+   Leave this window open.
 
    Chương trình sẽ tải và cài phần mềm của bên thứ ba, mỗi phần mềm theo giấy
    phép riêng: Ollama, uv, Python và các gói Python, llama.cpp, PyTorch, Piper
-   và các mô hình AI mở (NVIDIA Nemotron, Qwen, PhoWhisper). Tải khoảng 58 GB.
+   và các mô hình AI mở (NVIDIA Nemotron, Qwen, PhoWhisper). Chương trình đọc
+   cấu hình máy trước và chỉ tải mô hình vừa với máy: tối đa khoảng 58 GB.
    Hãy để cửa sổ này mở.
 
 '@
@@ -153,14 +155,15 @@ if (-not $GpuName) {
 }
 
 $MemGB = [math]::Round((Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory / 1GB)
-if ($Test -or $MemGB -ge 48) { Show-Ok "$MemGB GB memory" }
-else { Show-Warn "$MemGB GB memory: the chat model needs about 32 GB of it" "Máy có $MemGB GB bộ nhớ; mô hình chat cần khoảng 32 GB" }
+if ($Test -or $MemGB -ge 8) { Show-Ok "$MemGB GB memory (the AI models are chosen to fit it)" "Bộ nhớ $MemGB GB (mô hình AI sẽ được chọn cho vừa)" }
+else { Show-Warn "$MemGB GB memory: only the smallest AI models can run" "Máy có $MemGB GB bộ nhớ: chỉ chạy được các mô hình nhỏ nhất" }
 
+# The floor for the tools and the small models; each AI model's own size is checked when it is chosen.
 $FreeGB = [math]::Round((Get-Item -LiteralPath $Root).PSDrive.Free / 1GB)
-$NeedGB = if ($Test) { 12 } else { 70 }
+$NeedGB = if ($Test) { 12 } else { 20 }
 if ($FreeGB -ge $NeedGB) { Show-Ok "$FreeGB GB free disk" }
 else {
-    Show-Bad "Only $FreeGB GB free on this drive; about $NeedGB GB is needed" "Chỉ còn $FreeGB GB trống; cần khoảng $NeedGB GB"
+    Show-Bad "Only $FreeGB GB free on this drive; at least $NeedGB GB is needed" "Chỉ còn $FreeGB GB trống; cần ít nhất $NeedGB GB"
     if (-not $CheckOnly) { exit 1 }
 }
 
@@ -290,6 +293,89 @@ if ($compute -eq 'cuda') {
     Write-Log "ollama compute: $compute"
 }
 
+# =========================================================== model choice ===
+Show-Step 'Choosing the AI models for this computer' 'Chọn mô hình AI phù hợp với máy'
+
+# app\hardware.py reads the GPU, its memory (or memory shared with the CPU), the RAM and the
+# free disk, and judges every chat model of its catalog: fits, slower (partly on the CPU), or
+# too large for this computer, which is never offered.
+$Plan = $null
+$planJson = & $VenvPy (Join-Path $Root 'app\hardware.py') --json 2>$null
+if ($LASTEXITCODE -eq 0 -and $planJson) {
+    try { $Plan = ConvertFrom-Json ($planJson -join "`n") } catch { $Plan = $null }
+}
+$EntFits = $true; $EntWhy = ''
+if (-not $Plan) {
+    Show-Warn 'Could not read this computer: keeping the configured models' 'Không đọc được cấu hình máy: giữ các mô hình đã cấu hình'
+} else {
+    $hw = $Plan.hardware
+    $kindText = switch ([string]$hw.kind) {
+        'unified'  { 'unified memory shared by the CPU and the GPU' }
+        'discrete' { "$($hw.vram_gb) GB of GPU memory" }
+        default    { 'no NVIDIA GPU: models run on the processor' }
+    }
+    $gpuText = if ($hw.gpu) { [string]$hw.gpu } else { 'no GPU' }
+    Show-Ok "$gpuText, $kindText; $([math]::Round($hw.ram_gb)) GB RAM, $([math]::Round($hw.disk_free_gb)) GB free disk"
+    Write-Log "plan: $planJson"
+    $usable = @($Plan.models | Where-Object { $_.status -eq 'fits' -or $_.status -eq 'slow' })
+    $locked = @($Plan.models | Where-Object { $_.status -eq 'too_big' -or $_.status -eq 'no_disk' })
+    $current = @($Plan.models | Where-Object { $_.id -eq $ChatModel }) | Select-Object -First 1
+
+    if (Test-SettingChosen 'CHAT_MODEL') {
+        # Chosen before (an earlier setup, the workshop page, or by hand): kept.
+        Show-Ok "Chat model: $ChatModel (chosen earlier)" "Mô hình chat: $ChatModel (đã chọn trước đó)"
+        if ($current -and $current.status -eq 'too_big' -and $Plan.recommended) {
+            Show-Warn "$ChatModel is larger than this computer can run; $($Plan.recommended) would fit. Change it on the workshop page (Models)" `
+                      "$ChatModel lớn hơn mức máy chạy được; nên dùng $($Plan.recommended). Đổi trong trang workshop (mục Mô hình)"
+        }
+    } elseif (-not $usable) {
+        Show-Bad 'This computer has too little memory or disk for any of the chat models' 'Máy không đủ bộ nhớ hoặc ổ đĩa cho mô hình chat nào'
+        $CoreOk = $false
+    } else {
+        $choice = [string]$Plan.recommended
+        Write-Host ''
+        Write-Host '   Chat models that run on this computer / Mô hình chat chạy được trên máy này:'
+        for ($i = 0; $i -lt $usable.Count; $i++) {
+            $m = $usable[$i]
+            $tag = if ($m.id -eq $Plan.recommended) { '  recommended / đề xuất' } elseif ($m.status -eq 'slow') { '  slower: partly on the CPU / chậm hơn' } else { '' }
+            Write-Host ('     {0}  {1,-34} {2,5} GB' -f ($i + 1), $m.id, $m.size_gb) -NoNewline
+            Write-Host $tag -ForegroundColor $(if ($tag -like '*recommended*') { 'Green' } else { 'DarkGray' })
+        }
+        if ($locked) {
+            Write-Host "     $($locked.Count) larger model(s) need more than this computer has and are not offered." -ForegroundColor DarkGray
+            Write-Host "     $($locked.Count) mô hình lớn hơn cần nhiều hơn khả năng của máy nên không được chọn." -ForegroundColor DarkGray
+        }
+        if ($Interactive -and -not $Yes) {
+            $first = [array]::IndexOf(@($usable | ForEach-Object { $_.id }), $choice) + 1
+            Write-Host "`n   Press Enter for $first, or type another number."
+            $answer = Read-Host "   Nhấn Enter để chọn $first, hoặc gõ số khác"
+            $n = 0
+            if ([int]::TryParse("$answer".Trim(), [ref]$n) -and $n -ge 1 -and $n -le $usable.Count) { $choice = [string]$usable[$n - 1].id }
+        }
+        Set-LocalSetting 'CHAT_MODEL' $choice
+        $ChatModel = $choice
+        Show-Ok "Chat model for this computer: $ChatModel" "Mô hình chat cho máy này: $ChatModel"
+    }
+    # A small embedding model on a computer with little memory (the document index is rebuilt for it).
+    if (-not (Test-SettingChosen 'EMBED_MODEL') -and $Plan.embed_model -and $Plan.embed_model -ne $EmbedModel) {
+        Set-LocalSetting 'EMBED_MODEL' ([string]$Plan.embed_model)
+        $EmbedModel = [string]$Plan.embed_model
+        Show-Ok "Embedding model for this computer: $EmbedModel" "Mô hình nhúng cho máy này: $EmbedModel"
+    }
+    if (-not $Plan.enterprise.fits) {
+        $EntFits = $false
+        $EntWhy = switch ([string]$Plan.enterprise.reason) {
+            'disk'   { 'needs about 30 GB more free disk' }
+            'no_gpu' { 'needs an NVIDIA GPU' }
+            default  { 'needs about 40 GB of GPU or unified memory' }
+        }
+    } else {
+        # The batch demos' 25 GB must still fit once the chat model has arrived.
+        $chosen = @($Plan.models | Where-Object { $_.id -eq $ChatModel -and -not $_.installed }) | Select-Object -First 1
+        if ($chosen -and ($hw.disk_free_gb - $chosen.size_gb) -lt 30) { $EntFits = $false; $EntWhy = 'needs about 30 GB more free disk' }
+    }
+}
+
 # ================================================================== models ===
 Show-Step 'Downloading the AI models' 'Tải các mô hình AI'
 
@@ -309,10 +395,13 @@ foreach ($m in $models) {
     else { Show-Bad "Could not download $m" "Không tải được $m"; $CoreOk = $false }
 }
 if (Test-OllamaHas $ChatModel) {
-    # Hands-on 3 sends the tool list and the data preview with every step: give the chat model room.
-    $out = & $VenvPy (Join-Path $Root 'scripts\ollama-context.py') $ChatModel $WinChatContext 2>&1
+    # Hands-on 3 sends the tool list and the data preview with every step: give the chat model room
+    # (32,768 tokens, or 16,384 where the larger cache would not fit this computer's memory).
+    $ctx = "$(& $VenvPy (Join-Path $Root 'app\hardware.py') --context $ChatModel 2>$null)".Trim()
+    if ($ctx -notmatch '^\d+$') { $ctx = $WinChatContext }
+    $out = & $VenvPy (Join-Path $Root 'scripts\ollama-context.py') $ChatModel $ctx 2>&1
     $out | ForEach-Object { Write-Log "context: $_" }
-    if ($LASTEXITCODE -eq 0) { Show-Ok "Chat model context: $WinChatContext tokens" }
+    if ($LASTEXITCODE -eq 0) { Show-Ok "Chat model context: $ctx tokens" }
     else { Show-Warn 'Could not set the chat model context' 'Không đặt được ngữ cảnh cho mô hình chat' }
 }
 
@@ -498,6 +587,10 @@ function Set-EntFailed([string]$Why, [string]$Vi) {
 if ($SkipEnterprise -or $env:WORKSHOP_SKIP_ENTERPRISE) {
     $Ent = 'skipped'; $EntNote = 'skipped (-SkipEnterprise)'
     Show-Warn 'Skipped (-SkipEnterprise)' 'Đã bỏ qua'
+} elseif (-not $EntFits -and -not $Test -and -not $env:WORKSHOP_FORCE_ENTERPRISE) {
+    # The batch engine holds about 32 GB while it runs: only on computers that can spare it.
+    $Ent = 'skipped'; $EntNote = "this computer $EntWhy"
+    Show-Warn "Skipped: the batch engine $EntWhy" 'Đã bỏ qua: máy chủ xử lý hàng loạt cần nhiều bộ nhớ hoặc ổ đĩa hơn máy này có'
 }
 
 # 1. llama.cpp's llama-server: the CUDA build for an NVIDIA GPU, the CPU build otherwise.

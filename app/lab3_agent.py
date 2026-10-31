@@ -28,7 +28,8 @@ import urllib.request
 import uuid
 from pathlib import Path
 
-from common import (CHAT_MODEL, OLLAMA, ROOT, RUN_DIR, gateway_token, gateway_url,
+import common
+from common import (OLLAMA, ROOT, RUN_DIR, gateway_token, gateway_url,
                     setting, strip_thinking)
 
 LAB = ROOT / "hands-on-3-agent"
@@ -192,7 +193,7 @@ def chat_stream(route: str, messages: list[dict], tool_specs: list[dict], on_tex
     else:
         url = f"{OLLAMA}/v1/chat/completions"
         headers = {"Content-Type": "application/json"}
-        payload = {"model": CHAT_MODEL, "messages": messages, "tools": tool_specs,
+        payload = {"model": common.CHAT_MODEL, "messages": messages, "tools": tool_specs,
                    "stream": True, "temperature": 0.2}
         if REASONING and REASONING != "default":
             payload["reasoning_effort"] = REASONING
@@ -759,8 +760,8 @@ def _run(question: str, lang: str, data_name: str | None, route_pref: str, emit)
 
     t0 = time.time()
     send({"event": "start", "run": run_id, "route": route, "note": route_note,
-          "agent": f"openclaw/{AGENT_ID}" if route == "nemoclaw" else CHAT_MODEL,
-          "model": CHAT_MODEL, "data": data.name})
+          "agent": f"openclaw/{AGENT_ID}" if route == "nemoclaw" else common.CHAT_MODEL,
+          "model": common.CHAT_MODEL, "data": data.name})
 
     seen: dict[str, dict] = {}
     seen_meaning: dict[str, dict] = {}

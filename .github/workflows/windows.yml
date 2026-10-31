@@ -100,6 +100,12 @@ jobs:
           if ($h.features.sandbox -or $h.features.openclaw) { throw 'the Windows edition must not offer the sandbox or OpenClaw' }
           if (-not $h.ollama -or -not $h.chat_model.ready -or -not $h.embed_model.ready) { throw 'models not ready' }
 
+          # The hardware plan: what this machine is and which chat models fit it.
+          $plan = Invoke-RestMethod http://127.0.0.1:8090/api/models -TimeoutSec 30
+          Write-Host "hardware: $($plan.hardware | ConvertTo-Json -Compress)"
+          if (-not $plan.hardware.kind -or -not $plan.models) { throw 'no hardware plan' }
+          if ($plan.active -ne $h.chat_model.name) { throw "the plan's active model is $($plan.active)" }
+
           $page = (Invoke-WebRequest http://127.0.0.1:8090/ -UseBasicParsing).Content
           if ($page -notmatch 'window\.WORKSHOP=\{"edition": "windows"') { throw 'the page lacks the Windows edition settings' }
 
@@ -155,6 +161,7 @@ jobs:
             if ($studio -notmatch 'id="home-index"[^>]*><li><button type="button" class="chap"') { throw 'the studio page script did not render (no labs)' }
             if ($studio -notmatch 'id="home-specs"[^>]*><div class="spec"') { throw 'the studio page script did not render (no machine specs)' }
             if ($studio -notmatch 'id="mx-list"[^>]*><button type="button" class="mx-row') { throw 'the studio page script did not render (no RTX Spark section)' }
+            if ($studio -notmatch 'id="md-rows"[^>]*><li class="mrow') { throw 'the studio page script did not render (no Models section)' }
             Write-Host 'both pages render in Edge with the Windows edition'
           } else { Write-Host 'Edge not found: browser check skipped' }
           Stop-Process -Id $server.Id -Force

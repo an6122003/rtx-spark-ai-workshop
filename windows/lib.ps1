@@ -53,6 +53,32 @@ function Get-Setting([string]$Key, [string]$Default = '') {
     return $Default
 }
 
+# Remember a value for this machine in workshop.local.env (the chat model setup picked for it),
+# keeping the file's other lines. The workshop app writes the same file when the model is
+# switched on its page.
+function Set-LocalSetting([string]$Key, [string]$Value) {
+    $path = Join-Path $Root 'workshop.local.env'
+    $lines = New-Object System.Collections.Generic.List[string]
+    $done = $false
+    if (Test-Path -LiteralPath $path) {
+        foreach ($line in [IO.File]::ReadAllLines($path, [Text.Encoding]::UTF8)) {
+            $l = $line.Trim()
+            if (-not $l.StartsWith('#') -and $l.Contains('=') -and $l.Split('=', 2)[0].Trim() -eq $Key) {
+                if (-not $done) { $lines.Add("$Key=$Value"); $done = $true }
+                continue
+            }
+            $lines.Add($line)
+        }
+    }
+    if (-not $done) { $lines.Add("$Key=$Value") }
+    [IO.File]::WriteAllLines($path, $lines.ToArray(), (New-Object System.Text.UTF8Encoding $false))
+    $script:EnvLocal[$Key] = $Value
+}
+# Was this value chosen for this machine (environment or workshop.local.env), rather than the default?
+function Test-SettingChosen([string]$Key) {
+    return [bool]([Environment]::GetEnvironmentVariable($Key) -or ($script:EnvLocal.ContainsKey($Key) -and $script:EnvLocal[$Key]))
+}
+
 $ChatModel = Get-Setting 'CHAT_MODEL' 'nemotron-3.5-lightning:30b-a3b'
 $EmbedModel = Get-Setting 'EMBED_MODEL' 'qwen3-embedding:4b'
 $Lab1Base = Get-Setting 'LAB1_BASE_OLLAMA' 'qwen2.5:1.5b-instruct'

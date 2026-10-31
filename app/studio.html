@@ -3,12 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>On-device AI Workshop</title>
+<title>NVIDIA AI Workshop</title>
 <meta name="description" content="Fine-tuning, RAG, an agent and batch AI, running entirely on this machine.">
-<meta name="theme-color" content="#f5f4f1">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ebd5ae'/%3E%3Cstop offset='1' stop-color='%23a47d4c'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect x='3' y='3' width='26' height='26' rx='7' fill='%23f5f4f1' stroke='url(%23g)' stroke-width='2'/%3E%3Crect x='11' y='11' width='10' height='10' rx='2' fill='%2376b900'/%3E%3C/svg%3E">
+<meta name="theme-color" content="#000000">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%23000'/%3E%3Crect x='9' y='9' width='14' height='14' rx='1' fill='%2376b900'/%3E%3C/svg%3E">
 <!--WORKSHOP-EDITION-->
-<link rel="preload" href="/static/studio/fonts/PlusJakartaSans-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/static/fonts/BeVietnamPro-700-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/static/fonts/fonts.css">
 <link rel="stylesheet" href="/static/studio/fonts/fonts.css">
 <link rel="stylesheet" href="/static/studio/studio.css">
 </head>
@@ -18,19 +19,13 @@
 
 <header class="nav" id="hud">
   <a class="brand" href="#home" data-go="home" aria-label="Overview">
-    <svg viewBox="0 0 30 30" aria-hidden="true">
-      <defs><linearGradient id="brandgold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ebd5ae"/><stop offset=".45" stop-color="#cfa977"/><stop offset="1" stop-color="#a47d4c"/></linearGradient></defs>
-      <rect x="2" y="2" width="26" height="26" rx="7" fill="#fff" stroke="url(#brandgold)" stroke-width="1.6"/>
-      <g fill="#d8d5ce"><rect x="9" y="9" width="3.4" height="3.4" rx=".8"/><rect x="13.3" y="9" width="3.4" height="3.4" rx=".8"/><rect x="17.6" y="9" width="3.4" height="3.4" rx=".8"/>
-      <rect x="9" y="13.3" width="3.4" height="3.4" rx=".8"/><rect x="17.6" y="13.3" width="3.4" height="3.4" rx=".8"/>
-      <rect x="9" y="17.6" width="3.4" height="3.4" rx=".8"/><rect x="13.3" y="17.6" width="3.4" height="3.4" rx=".8"/><rect x="17.6" y="17.6" width="3.4" height="3.4" rx=".8"/></g>
-      <rect x="13.3" y="13.3" width="3.4" height="3.4" rx=".8" fill="#76b900"/>
-    </svg>
+    <img class="nvlogo" src="/static/brand/nvidia.svg" alt="NVIDIA" width="104" height="19">
     <span class="bt"><b data-i18n="brand_t"></b><span data-i18n="brand_s"></span></span>
   </a>
   <ol class="chapters">
     <li class="ch-word"><a href="#home" data-go="home"><span class="t" data-i18n="ch_home"></span></a></li>
-    <li class="ch-word"><a href="#home" data-go="home" data-scroll="machine-h"><span class="t">RTX Spark</span></a></li>
+    <li class="ch-word need-spark"><a href="#home" data-go="home" data-scroll="machine-h"><span class="t">RTX Spark</span></a></li>
+    <li class="ch-word need-models"><a href="#home" data-go="home" data-scroll="models-h"><span class="t" data-i18n="ch_models"></span><i class="lamp" id="lamp-models"></i></a></li>
     <li><a href="#lab1" data-go="lab1"><span class="n">01</span><span class="t" data-i18n="ch_lab1"></span><i class="lamp" id="lamp-lab1"></i></a></li>
     <li><a href="#lab2" data-go="lab2"><span class="n">02</span><span class="t" data-i18n="ch_lab2"></span><i class="lamp" id="lamp-lab2"></i></a></li>
     <li><a href="#lab3" data-go="lab3"><span class="n">03</span><span class="t" data-i18n="ch_lab3"></span><i class="lamp" id="lamp-lab3"></i></a></li>
@@ -59,17 +54,30 @@
     <dl class="specs reveal" id="home-specs"></dl>
   </div>
 
-  <div class="section-h" id="machine-h"><span class="lbl" data-i18n="sec_machine"></span><h2 data-i18n="sec_machine_h"></h2></div>
-  <p class="lead mx-lead" data-i18n="mx_lead"></p>
-  <div class="machine" id="machine">
+  <div class="section-h need-spark" id="machine-h"><span class="lbl" data-i18n="sec_machine"></span><h2 data-i18n="sec_machine_h"></h2></div>
+  <p class="lead mx-lead need-spark" data-i18n="mx_lead"></p>
+  <div class="machine need-spark" id="machine">
     <div class="mx-list" id="mx-list" role="tablist" aria-label="NVIDIA RTX Spark"></div>
     <div class="mx-stage" id="mx-stage">
       <div class="mx-live" id="mx-live" aria-live="polite"></div>
     </div>
   </div>
-  <div class="mx-foot">
+  <div class="mx-foot need-spark">
     <p class="mx-feat" id="mx-feat"></p>
     <p class="note-s" id="mx-src"></p>
+  </div>
+
+  <div class="section-h need-models" id="models-h"><span class="lbl" data-i18n="sec_models"></span><h2 data-i18n="sec_models_h"></h2></div>
+  <p class="lead md-lead need-models" data-i18n="md_lead"></p>
+  <div class="models need-models" id="models">
+    <article class="plate md-hw reveal" id="md-hw"></article>
+    <article class="plate reveal">
+      <div class="plate-h"><span class="lbl" data-i18n="md_list"></span><span class="count" id="md-count"></span></div>
+      <div id="md-alert"></div>
+      <div class="mlegend" id="md-legend"></div>
+      <ol class="mrows" id="md-rows"></ol>
+      <p class="note-s" id="md-note"></p>
+    </article>
   </div>
 
   <div class="section-h"><span class="lbl" data-i18n="sec_labs"></span><h2 data-i18n="sec_labs_h"></h2></div>

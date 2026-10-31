@@ -46,9 +46,12 @@ if (-not (Test-OllamaUp)) {
 }
 Show-Ok "Ollama $(Get-OllamaRunningVersion) is running" 'Ollama đang chạy'
 
-# A model pulled again loses its context setting: re-apply it (local, nothing downloaded).
+# A model pulled again loses its context setting: re-apply it (local, nothing downloaded),
+# as large as fits this computer (app\hardware.py).
 if (Test-OllamaHas $ChatModel) {
-    $null = & $VenvPy (Join-Path $Root 'scripts\ollama-context.py') $ChatModel $WinChatContext 2>&1
+    $ctx = "$(& $VenvPy (Join-Path $Root 'app\hardware.py') --context $ChatModel 2>$null)".Trim()
+    if ($ctx -notmatch '^\d+$') { $ctx = $WinChatContext }
+    $null = & $VenvPy (Join-Path $Root 'scripts\ollama-context.py') $ChatModel $ctx 2>&1
 }
 
 # An app left running (another window, or an older version) is replaced.
