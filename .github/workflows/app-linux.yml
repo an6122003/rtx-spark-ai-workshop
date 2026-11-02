@@ -59,7 +59,9 @@ jobs:
           import json, urllib.request
           h = json.load(open("health.json"))
           assert h["edition"] == "dgx", h["edition"]
-          assert h["features"] == {"sandbox": True, "openclaw": True, "enterprise": True, "lab1_train": True}, h["features"]
+          # models: the Windows edition's Models section; spark: an Arm machine without a discrete GPU keeps the RTX Spark section
+          assert h["features"] == {"sandbox": True, "openclaw": True, "enterprise": True, "lab1_train": True,
+                                   "models": False, "spark": True}, h["features"]
           page = urllib.request.urlopen("http://127.0.0.1:8090/").read().decode("utf-8")
           assert 'window.WORKSHOP={"edition": "dgx"' in page, "edition settings missing from the page"
           assert "no-sandbox" in page  # the class names are in the inlined script, applied only when a feature is off
